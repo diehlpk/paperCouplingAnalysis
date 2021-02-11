@@ -53,7 +53,7 @@ def forceCoupling(n,x):
     
     force = np.zeros(3*n)
    
-    for i in range(1,2*n-1):
+    for i in range(1,3*n-1):
         force[i] = f(x[i])
     
     force[3*n-1] = 1
@@ -98,8 +98,8 @@ def CouplingFDFD(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = -1
-    M[n-1][n] = 1
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1 
 
     M[n][n-1] = 3*h
     M[n][n-2] = -4*h
@@ -114,16 +114,16 @@ def CouplingFDFD(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[2*n-1][2*n-1] = -1
+    M[2*n-1][2*n-1] = -1 
     M[2*n-1][2*n] = 1
 
     M[2*n][2*n-1] = 3*h
     M[2*n][2*n-2] = -4*h
-    M[2*n][2*n-3] = 1*h
+    M[2*n][2*n-3] = h
 
     M[2*n][2*n] = 3*h
     M[2*n][2*n+1] = -4*h
-    M[2*n][2*n+2] = 1*h
+    M[2*n][2*n+2] = h
 
     for i in range(2*n+1,3*n-1):
         M[i][i-1] = -2
@@ -135,6 +135,8 @@ def CouplingFDFD(n,h):
     M[3*n-1][3*n-3] = h
 
     M *= 1./(2.*h*h)
+
+    np.savetxt("fd.csv", M, delimiter=",")
     
     return M
 
@@ -147,6 +149,7 @@ def VHM(n,h):
     MVHM = np.zeros([n,n])
 
     MVHM[0][0] = 1.
+
     MVHM[1][0] = -8.
     MVHM[1][1] = 16.
     MVHM[1][2] = -8.
@@ -174,7 +177,7 @@ def VHM(n,h):
 
 #############################################################################
 # Assemble the stiffness matrix for the coupling of FDM - VHM - FDM
- #############################################################################
+#############################################################################
 
 def CouplingFDVHM(n,h):
 
@@ -183,7 +186,6 @@ def CouplingFDVHM(n,h):
 
     M = np.zeros([3*n,3*n])
     
-
     M[0][0] = 1 * fFDM
 
     for i in range(1,n-1):
@@ -192,7 +194,7 @@ def CouplingFDVHM(n,h):
         M[i][i+1] = -2 * fFDM
 
     M[n-1][n-1] = -1 
-    M[n-1][n] = 1
+    M[n-1][n] = 1  
 
     M[n][n-1] = 3*h * fFDM
     M[n][n-2] = -4*h * fFDM
@@ -202,23 +204,23 @@ def CouplingFDVHM(n,h):
     M[n][n+1] = -16*h  * fVHM
     M[n][n+2] = 4*h  * fVHM
 
-    M[n+1][n+1] = 8*h * fVHM
-    M[n+1][n+2] = -16*h * fVHM
-    M[n+1][n+3] = 8*h * fVHM
+    M[n+1][n] = -8 * fVHM
+    M[n+1][n+1] = 16 * fVHM
+    M[n+1][n+2] = -8 * fVHM
 
     for i in range(n+2,2*n-2):
         M[i][i-2] = -1. * fVHM
         M[i][i-1] = -4. * fVHM
         M[i][i] = 10. * fVHM
-        M[i][i+1] = -4. * fVHM
+        M[i][i+1] =  -4. * fVHM
         M[i][i+2] = -1. * fVHM
 
-    M[2*n-2][2*n-3] = 8*h * fVHM
-    M[2*n-2][2*n-2] = -16*h * fVHM
-    M[2*n-2][2*n-1] = 8*h * fVHM
+    M[2*n-2][2*n-3] = -8 * fVHM
+    M[2*n-2][2*n-2] = 16 * fVHM
+    M[2*n-2][2*n-1] = -8 * fVHM
 
-    M[2*n-1][2*n-1] = -1
-    M[2*n-1][2*n] = 1
+    M[2*n-1][2*n-1] = -1 
+    M[2*n-1][2*n] = 1  
 
     M[2*n][2*n-1] = 12*h * fVHM
     M[2*n][2*n-2] = -16*h * fVHM
@@ -238,6 +240,9 @@ def CouplingFDVHM(n,h):
     M[3*n-1][3*n-3] = h * fFDM
 
     print(M)
+    np.savetxt("pd.csv", M, delimiter=",")
+    #plt.matshow(M)
+    #plt.show()
     
     return M
 
@@ -248,47 +253,51 @@ def CouplingFDPD():
     return M
 
 
-n = 4
-h = 1./n
-nodes = n + 1
-nodesFull = 3 * n + 1
 
-x1 = np.linspace(0,1,nodes)
-x2 = np.linspace(1,2.,nodes)
-x3 = np.linspace(2,3.,nodes)
-x = np.array(np.concatenate((x1,x2,x3)))
+for i in range(2,5):
+    n = np.power(2,i)
+    h = 1./n
+    nodes = n + 1
+    nodesFull = 3 * n + 1
 
+    print(nodes)
+    x1 = np.linspace(0,1,nodes)
+    x2 = np.linspace(1,2.,nodes)
+    x3 = np.linspace(2,3.,nodes)
+    x = np.array(np.concatenate((x1,x2,x3)))
 
-print(x)
+    print(x)
 
+    forceCoupled = forceCoupling(nodes,x)
+    forceCoupled[n] = 0
+    forceCoupled[n+1] = 0
 
+    forceCoupled[2*n+1] = 0
+    forceCoupled[2*n+2] = 0
 
+    print(x)
+    print(forceCoupled)
 
-xFull = np.linspace(0,3.,nodesFull)
+    uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
 
-print(len(x))
+    plt.plot(x,uFDMVHM,label=r"FDM-VHM ($\delta$="+str(2*h)+")")
 
-uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
+    #if i == 7:
 
-forceCoupled = forceCoupling(nodes,x)
-#forceCoupled[2*n-1] = 0
-#forceCoupled[2*n] = 0
+        #xFull = np.linspace(0,3.,nodesFull)
 
-#print(forceCoupled)
-#print(forceFull(nodesFull,h))
+        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+        #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
+    uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
+        #plt.plot(xFull,uFD,label="FDM")
+        #plt.plot(xFull,uVHM,label="VHM")
+    plt.plot(x,uFDFD,label="FDM-FDM")
 
-uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
-uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
-
-
-plt.plot(xFull,uFD,label="FDM")
-plt.plot(xFull,uVHM,label="VHM")
-plt.plot(x,uFDFD,label="FDM-FDM")
-plt.plot(x,uFDMVHM,label="FDM-VHM")
+    
 plt.title(example+" loading")
 plt.legend()
 plt.grid()
+plt.xlabel("$x$")
 
-plt.show()
+plt.savefig("coupling-"+example.lower()+".pdf",bbox_inches='tight')
 
