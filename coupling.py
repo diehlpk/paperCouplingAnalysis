@@ -135,8 +135,6 @@ def CouplingFDFD(n,h):
     M[3*n-1][3*n-3] = h
 
     M *= 1./(2.*h*h)
-
-    np.savetxt("fd.csv", M, delimiter=",")
     
     return M
 
@@ -239,18 +237,19 @@ def CouplingFDVHM(n,h):
     M[3*n-1][3*n-2] = -4*h * fFDM
     M[3*n-1][3*n-3] = h * fFDM
 
-    print(M)
-    np.savetxt("pd.csv", M, delimiter=",")
+    #print(M)
+    #np.savetxt("pd.csv", M, delimiter=",")
     #plt.matshow(M)
     #plt.show()
     
     return M
 
-def CouplingFDPD():
+#def CouplingFDPD():
+#
+#    M = np.zeros([n,n])
+#
+#    return M
 
-    M = np.zeros([n,n])
-
-    return M
 
 
 
@@ -266,8 +265,6 @@ for i in range(2,5):
     x3 = np.linspace(2,3.,nodes)
     x = np.array(np.concatenate((x1,x2,x3)))
 
-    print(x)
-
     forceCoupled = forceCoupling(nodes,x)
     forceCoupled[n] = 0
     forceCoupled[n+1] = 0
@@ -275,8 +272,6 @@ for i in range(2,5):
     forceCoupled[2*n+1] = 0
     forceCoupled[2*n+2] = 0
 
-    print(x)
-    print(forceCoupled)
 
     uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
 
