@@ -51,12 +51,12 @@ def forceFull(n,h):
 
 def forceCoupling(n,x):
     
-    force = np.zeros(3*n)
+    force = np.zeros(3*n+4)
    
-    for i in range(1,3*n-1):
+    for i in range(1,3*n+4):
         force[i] = f(x[i])
     
-    force[3*n-1] = 1
+    force[3*n+3] = 1
     
     return force
 
@@ -141,178 +141,88 @@ def CouplingFDFD(n,h):
     return M
 
 #############################################################################
-# Assemble the stiffness matrix for the varibale horizon model (VHM)
+# Assemble the stiffness matrix for the coupling of FDM - Displacement - FDM 
 #############################################################################
 
-def VHM(n,h):
-        
-    MVHM = np.zeros([n,n])
+def Coupling(n,h):
 
-    MVHM[0][0] = 1.
+    M = np.zeros([3*n+4,3*n+4])
 
-    MVHM[1][0] = -8.
-    MVHM[1][1] = 16.
-    MVHM[1][2] = -8.
-
-    for i in range(2,n-2):
-        MVHM[i][i-2] = -1.
-        MVHM[i][i-1] = -4.
-        MVHM[i][i] = 10.
-        MVHM[i][i+1] = -4.
-        MVHM[i][i+2] = -1.
-
-
-    MVHM[n-2][n-1] = -8.
-    MVHM[n-2][n-2] = 16.
-    MVHM[n-2][n-3] = -8.
-
-    MVHM[n-1][n-1] = 12.*h
-    MVHM[n-1][n-2] = -16.*h
-    MVHM[n-1][n-3] = 4.*h
-
-    MVHM *= 1./(8.*h*h)
+    h =1
     
-    return  MVHM
+    # Boundary
 
+    M[0][0] = 1
 
-#############################################################################
-# Assemble the stiffness matrix for the coupling of FDM - VHM - FDM
-#############################################################################
+    # FD 
 
-def CouplingFDVHM(n,h):
+    for i in range(1,n-3):
+        M[i][i-1] = -2
+        M[i][i] = 4
+        M[i][i+1] = -2
 
-    fVHM = 1./(8.*h*h)
-    fFDM = 1./(2.*h*h)
+    # Overlapp
 
-    M = np.zeros([3*n,3*n])
-    
-    M[0][0] = 1 * fFDM
+    M[n-3][n-3] = -1
+    M[n-3][n] = 1
 
-    for i in range(1,n-1):
-        M[i][i-1] = -2 * fFDM
-        M[i][i] = 4 * fFDM
-        M[i][i+1] = -2 * fFDM
+    M[n-2][n-2] = -1
+    M[n-2][n+1] = 1
 
-    M[n-1][n-1] = -1 
-    M[n-1][n] = 1  
+    M[n-1][n-1] = -1
+    M[n-1][n+2] = 1
 
-    M[n][n-1] = 3*h * fFDM
-    M[n][n-2] = -4*h * fFDM
-    M[n][n-3] = 1*h * fFDM
+    # PD
 
-    M[n][n] = 12*h  * fVHM
-    M[n][n+1] = -16*h  * fVHM
-    M[n][n+2] = 4*h  * fVHM
+    M[n][n] = 1 
+    M[n][n+1] = -1 
 
-    M[n+1][n] = -8 * fVHM
-    M[n+1][n+1] = 16 * fVHM
-    M[n+1][n+2] = -8 * fVHM
+    M[n+1][n] = -1 
+    M[n+1][n+1] =  2 
+    M[n+1][n+2] = -1 
 
-    for i in range(n+2,2*n-2):
-        M[i][i-2] = -1. * fVHM
-        M[i][i-1] = -4. * fVHM
-        M[i][i] = 10. * fVHM
-        M[i][i+1] =  -4. * fVHM
-        M[i][i+2] = -1. * fVHM
-
-    M[2*n-2][2*n-3] = -8 * fVHM
-    M[2*n-2][2*n-2] = 16 * fVHM
-    M[2*n-2][2*n-1] = -8 * fVHM
-
-    M[2*n-1][2*n-1] = -1 
-    M[2*n-1][2*n] = 1  
-
-    M[2*n][2*n-1] = 12*h * fVHM
-    M[2*n][2*n-2] = -16*h * fVHM
-    M[2*n][2*n-3] = 4*h * fVHM
-
-    M[2*n][2*n] = 3*h * fFDM
-    M[2*n][2*n+1] = -4*h * fFDM
-    M[2*n][2*n+2] = 1*h * fFDM
-
-    for i in range(2*n+1,3*n-1):
-        M[i][i-1] = -2 * fFDM
-        M[i][i] = 4 * fFDM
-        M[i][i+1] = -2 * fFDM
-
-    M[3*n-1][3*n-1] = 3*h * fFDM
-    M[3*n-1][3*n-2] = -4*h * fFDM
-    M[3*n-1][3*n-3] = h * fFDM
-    
-    return M
-
-#############################################################################
-# Assemble the stiffness matrix for the coupling of FDM - Stress - FDM (Eq. 10)
-#############################################################################
-
-def CouplingFDStress(n,h):
-
-    M = np.zeros([3*n,3*n])
-    
-    M[0][0] = 1 
-
-    for i in range(1,n-1):
-        M[i][i-1] = -2 
-        M[i][i] = 4 
-        M[i][i+1] = -2 
-
-    M[n-1][n-1] = -1 
-    M[n-1][n] = 1  
-
-    M[n][n-1] = 3*h 
-    M[n][n-2] = -4*h 
-    M[n][n-3] = 1*h 
-
-    M[n][n] = 5 *h
-    M[n][n+1] = -4 *h 
-    M[n][n+2] = -1 *h
-
-    M[n+1][n] = 5 *h
-    M[n+1][n+1] = -4 *h 
-    M[n+1][n+2] = -1 *h
-
-
-
-
-    M[n+2][n+1] = -1 
-    M[n+2][n+2] =  2 
-    M[n+2][n+3] = -1 
-
-    for i in range(n+3,2*n-2):
+    for i in range(n+2,2*n+2):
         M[i][i-2] = -1. 
         M[i][i-1] = -4. 
         M[i][i] = 10. 
         M[i][i+1] =  -4. 
         M[i][i+2] = -1. 
 
-    M[2*n-2][2*n-3] = -1 
-    M[2*n-2][2*n-2] = 2 
-    M[2*n-2][2*n-1] = -1 
+    M[2*n+2][2*n+1] = -1 
+    M[2*n+2][2*n+2] = 2 
+    M[2*n+2][2*n+3] = -1 
 
-    M[2*n-1][2*n-1] = -1 
-    M[2*n-1][2*n] = 1  
+    M[2*n+3][2*n+3] = 1 
+    M[2*n+3][2*n+2] = -1  
 
-    M[2*n][2*n-1] = 3*h 
-    M[2*n][2*n-2] = -4*h 
-    M[2*n][2*n-3] = 1*h 
+    # Overlap
 
-    M[2*n][2*n] = 3*h 
-    M[2*n][2*n+1] = -4*h 
-    M[2*n][2*n+2] = 1*h 
+    M[2*n+4][2*n+4] = -1
+    M[2*n+4][2*n+1] = 1
 
-    for i in range(2*n+1,3*n-1):
-        M[i][i-1] = -2 
-        M[i][i] = 4 
-        M[i][i+1] = -2 
+    M[2*n+5][2*n+5] = -1
+    M[2*n+5][2*n+2] = 1
 
-    M[3*n-1][3*n-1] = 3*h 
-    M[3*n-1][3*n-2] = -4*h 
-    M[3*n-1][3*n-3] = h 
+    M[2*n+6][2*n+6] = -1
+    M[2*n+6][2*n+3] = 1
 
-    M *= 1./(2.*h*h)
+    # FD
+
+    for i in range(2*n+7,3*n+3):
+        M[i][i-1] = -2
+        M[i][i] = 4
+        M[i][i+1] = -2
+
+    # Boundary
+
+    M[3*n+3][3*n+3] = 3*h 
+    M[3*n+3][3*n+2] = -4*h 
+    M[3*n+3][3*n+1] = h 
+
+    #M *= 1./(2.*h*h)
 
     #print(M)
-    np.savetxt("pd.csv", M, delimiter=",")
+    np.savetxt("pd2.csv", M, delimiter=",")
     #plt.matshow(M)
     #plt.show()
     
@@ -330,32 +240,45 @@ for i in range(2,3):
 
     print(nodes,h)
     x1 = np.linspace(0,1,nodes)
-    x2 = np.linspace(1,2.,nodes)
+    x2 = np.linspace(1-2*h,2+2*h,nodes+4)
     x3 = np.linspace(2,3.,nodes)
     x = np.array(np.concatenate((x1,x2,x3)))
 
+    #print(x1)
+    #print(x2)
+    #print(x3)
+
     forceCoupled = forceCoupling(nodes,x)
-    forceCoupled[n] = 0
-    forceCoupled[n+1] = 0
 
-    forceCoupled[2*n+1] = 0
-    forceCoupled[2*n+2] = 0
+    print(forceCoupled)
+
+    forceCoupled[2] = 0
+    forceCoupled[3] = 0
+    forceCoupled[4] = 0
 
 
-    uFDMVHM = solve(CouplingFDStress(nodes,h),forceCoupled)
+    forceCoupled[14] = 0
+    forceCoupled[15] = 0
+    forceCoupled[16] = 0
+
+
+
+    uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
+
+    #print(uFDMVHM)
 
     plt.plot(x,uFDMVHM,label=r"FDM-VHM ($\delta$="+str(2*h)+")")
 
     #if i == 7:
 
-        #xFull = np.linspace(0,3.,nodesFull)
+    xFull = np.linspace(0,3.,nodesFull)
 
-        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
         #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
-    uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
+    #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
         #plt.plot(xFull,uFD,label="FDM")
         #plt.plot(xFull,uVHM,label="VHM")
-    plt.plot(x,uFDFD,label="FDM-FDM")
+    plt.plot(xFull,uFD,label="FDM-FDM")
 
     
 plt.title(example+" loading")
