@@ -229,7 +229,9 @@ def Coupling(n,h):
     return M
 
 
-for i in range(2,5):
+markers = ['s','o','x','.']
+
+for i in range(2,6):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -240,6 +242,8 @@ for i in range(2,5):
     x2 = np.linspace(1-2*h,2+2*h,nodes+4)
     x3 = np.linspace(2,3.,nodes)
     x = np.array(np.concatenate((x1,x2,x3)))
+
+    xFull = np.linspace(0,3.,nodesFull)
 
   
     forceCoupled = forceCoupling(nodes,x)
@@ -254,30 +258,33 @@ for i in range(2,5):
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 
-    print(max(uFDMVHM))
+    print(x)
+    print(np.array(np.concatenate((x[0:nodes],x[nodes+3:2*nodes+2],x[2*nodes+5:len(x)]))))
 
-    #print(uFDMVHM)
+    uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.plot(x,uFDMVHM,label=r"FDM-VHM ($\delta$="+str(2*h)+")")
+    plt.plot(xFull,uSlice-exactSolution(xFull),label=r"FDM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2])
 
-    if i == 4:
+    #if i == 5:
 
-        xFull = np.linspace(0,3.,nodesFull)
+        #xFull = np.linspace(0,3.,nodesFull)
+        #print(xFull)
 
-        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
         #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
-    #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
+        #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
         #plt.plot(xFull,uFD,label="FDM")
         #plt.plot(xFull,uVHM,label="VHM")
-        plt.plot(xFull,uFD,label="FDM-FDM")
-        plt.plot(xFull,exactSolution(xFull),label="Exact")
+        #plt.plot(xFull,uFD,label="FDM-FDM")
+        #plt.plot(xFull,exactSolution(xFull),label="Exact")
 
 
     
-plt.title(example+" loading")
+plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
+plt.ylabel("Error in displacement")
 
 plt.savefig("coupling-"+example.lower()+"-approach-1.pdf",bbox_inches='tight')
 
