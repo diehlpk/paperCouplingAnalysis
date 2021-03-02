@@ -258,12 +258,12 @@ for i in range(2,6):
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 
-    print(x)
-    print(np.array(np.concatenate((x[0:nodes],x[nodes+3:2*nodes+2],x[2*nodes+5:len(x)]))))
+    #print(x)
+    #print(np.array(np.concatenate((x[0:nodes],x[nodes+3:2*nodes+2],x[2*nodes+5:len(x)]))))
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),label=r"FDM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2])
+    plt.scatter(xFull,uSlice-exactSolution(xFull),label=r"FDM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2])
 
     #if i == 5:
 
