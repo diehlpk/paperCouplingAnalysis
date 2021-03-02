@@ -67,9 +67,9 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return 2.8*x*(3-x)*(3+x)/6.
+        return - x *x * x / 6 + 5.5 * x
     elif example == "Quartic":
-        return x*(44-x*x*x)/12
+        return - x * x * x * x / 12 + 10 * x
     elif example == "Quadratic":
         return -0.5 * x * x + 4 *x
     elif example == "Linear":
