@@ -148,7 +148,10 @@ def Coupling(n,h):
 
     M = np.zeros([3*n+4,3*n+4])
 
-    h =1
+    fFD =  1./(2.*h*h)
+    fPD =  1./(8.*h*h)
+
+    #h =1
     
     # Boundary
 
@@ -156,68 +159,68 @@ def Coupling(n,h):
 
     # FD 
 
-    for i in range(1,n-3):
-        M[i][i-1] = -2
-        M[i][i] = 4
-        M[i][i+1] = -2
+    for i in range(1,n-1):
+        M[i][i-1] = -2 * fFD
+        M[i][i] = 4 * fFD
+        M[i][i+1] = -2 * fFD
 
     # Overlapp
-
-    M[n-3][n-3] = -1
-    M[n-3][n] = 1
-
-    M[n-2][n-2] = -1
-    M[n-2][n+1] = 1
 
     M[n-1][n-1] = -1
     M[n-1][n+2] = 1
 
+    M[n][n] = -1
+    M[n][n-3] = 1
+
+    M[n+1][n+1] = -1
+    M[n+1][n-2] = 1
+
     # PD
 
-    M[n][n] = 1 
-    M[n][n+1] = -1 
+    #M[n][n] = 1  * fPD
+    #M[n][n+1] = -1 * fPD
 
-    M[n+1][n] = -1 
-    M[n+1][n+1] =  2 
-    M[n+1][n+2] = -1 
+    #M[n+1][n] = -1  * fPD
+    #M[n+1][n+1] =  2  * fPD
+    #M[n+1][n+2] = -1  * fPD
 
     for i in range(n+2,2*n+2):
-        M[i][i-2] = -1. 
-        M[i][i-1] = -4. 
-        M[i][i] = 10. 
-        M[i][i+1] =  -4. 
-        M[i][i+2] = -1. 
+        M[i][i-2] = -1.  * fPD
+        M[i][i-1] = -4. * fPD
+        M[i][i] = 10. * fPD
+        M[i][i+1] =  -4. * fPD
+        M[i][i+2] = -1. * fPD
 
-    M[2*n+2][2*n+1] = -1 
-    M[2*n+2][2*n+2] = 2 
-    M[2*n+2][2*n+3] = -1 
+    #M[2*n][2*n-1] = -1 * fPD
+    #M[2*n][2*n] = 2 * fPD
+    #M[2*n][2*n+1] = -1 * fPD
 
-    M[2*n+3][2*n+3] = 1 
-    M[2*n+3][2*n+2] = -1  
+    #M[2*n+1][2*n+1] = 1 * fPD
+    #M[2*n+1][2*n] = -1  * fPD
 
     # Overlap
+
+    M[2*n+2][2*n+2] = -1
+    M[2*n+2][2*n+5] = 1
+
+    M[2*n+3][2*n+3] = -1
+    M[2*n+3][2*n+6] = 1
 
     M[2*n+4][2*n+4] = -1
     M[2*n+4][2*n+1] = 1
 
-    M[2*n+5][2*n+5] = -1
-    M[2*n+5][2*n+2] = 1
-
-    M[2*n+6][2*n+6] = -1
-    M[2*n+6][2*n+3] = 1
-
     # FD
 
-    for i in range(2*n+7,3*n+3):
-        M[i][i-1] = -2
-        M[i][i] = 4
-        M[i][i+1] = -2
+    for i in range(2*n+5,3*n+3):
+        M[i][i-1] = -2 * fFD
+        M[i][i] = 4 * fFD
+        M[i][i+1] = -2 * fFD
 
     # Boundary
 
-    M[3*n+3][3*n+3] = 3*h 
-    M[3*n+3][3*n+2] = -4*h 
-    M[3*n+3][3*n+1] = h 
+    M[3*n+3][3*n+3] = 3*h * fFD
+    M[3*n+3][3*n+2] = -4*h * fFD
+    M[3*n+3][3*n+1] = h * fFD
 
     #M *= 1./(2.*h*h)
 
@@ -246,7 +249,7 @@ for i in range(2,3):
 
     #print(x1)
     #print(x2)
-    #print(x3)
+    print(x)
 
     forceCoupled = forceCoupling(nodes,x)
 
