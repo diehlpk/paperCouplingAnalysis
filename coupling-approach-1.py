@@ -61,6 +61,24 @@ def forceCoupling(n,x):
     return force
 
 #############################################################################
+# Exact solution 
+#############################################################################
+
+def exactSolution(x):
+    
+    if example == "Cubic":
+        return 2.8*x*(3-x)*(3+x)/6.
+    elif example == "Quartic":
+        return x*(44-x*x*x)/12
+    elif example == "Quadratic":
+        return -0.5 * x * x + 4 *x
+    elif example == "Linear":
+        return x
+    else:
+        print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
+        sys.exit()
+
+#############################################################################
 # Assemble the stiffness matrix for the finite difference model (FD)
 #############################################################################
 
@@ -136,7 +154,7 @@ def CouplingFDFD(n,h):
 
     M *= 1./(2.*h*h)
 
-    np.savetxt("fd.csv", M, delimiter=",")
+    #np.savetxt("fd.csv", M, delimiter=",")
     
     return M
 
@@ -151,8 +169,6 @@ def Coupling(n,h):
     fFD =  1./(2.*h*h)
     fPD =  1./(8.*h*h)
 
-    #h =1
-    
     # Boundary
 
     M[0][0] = 1
@@ -177,26 +193,12 @@ def Coupling(n,h):
 
     # PD
 
-    #M[n][n] = 1  * fPD
-    #M[n][n+1] = -1 * fPD
-
-    #M[n+1][n] = -1  * fPD
-    #M[n+1][n+1] =  2  * fPD
-    #M[n+1][n+2] = -1  * fPD
-
     for i in range(n+2,2*n+2):
         M[i][i-2] = -1.  * fPD
         M[i][i-1] = -4. * fPD
         M[i][i] = 10. * fPD
         M[i][i+1] =  -4. * fPD
         M[i][i+2] = -1. * fPD
-
-    #M[2*n][2*n-1] = -1 * fPD
-    #M[2*n][2*n] = 2 * fPD
-    #M[2*n][2*n+1] = -1 * fPD
-
-    #M[2*n+1][2*n+1] = 1 * fPD
-    #M[2*n+1][2*n] = -1  * fPD
 
     # Overlap
 
@@ -222,20 +224,12 @@ def Coupling(n,h):
     M[3*n+3][3*n+2] = -4*h * fFD
     M[3*n+3][3*n+1] = h * fFD
 
-    #M *= 1./(2.*h*h)
+    #np.savetxt("pd2.csv", M, delimiter=",")
 
-    #print(M)
-    np.savetxt("pd2.csv", M, delimiter=",")
-    #plt.matshow(M)
-    #plt.show()
-    
     return M
 
 
-
-
-
-for i in range(2,3):
+for i in range(2,5):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -247,41 +241,37 @@ for i in range(2,3):
     x3 = np.linspace(2,3.,nodes)
     x = np.array(np.concatenate((x1,x2,x3)))
 
-    #print(x1)
-    #print(x2)
-    print(x)
-
+  
     forceCoupled = forceCoupling(nodes,x)
 
-    print(forceCoupled)
+    forceCoupled[nodes-1] = 0
+    forceCoupled[nodes] = 0
+    forceCoupled[nodes+1] = 0
 
-    forceCoupled[2] = 0
-    forceCoupled[3] = 0
-    forceCoupled[4] = 0
-
-
-    forceCoupled[14] = 0
-    forceCoupled[15] = 0
-    forceCoupled[16] = 0
-
-
+    forceCoupled[2*nodes+2] = 0
+    forceCoupled[2*nodes+3] = 0
+    forceCoupled[2*nodes+4] = 0
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
+
+    print(max(uFDMVHM))
 
     #print(uFDMVHM)
 
     plt.plot(x,uFDMVHM,label=r"FDM-VHM ($\delta$="+str(2*h)+")")
 
-    #if i == 7:
+    if i == 4:
 
-    xFull = np.linspace(0,3.,nodesFull)
+        xFull = np.linspace(0,3.,nodesFull)
 
-    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
         #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
     #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
         #plt.plot(xFull,uFD,label="FDM")
         #plt.plot(xFull,uVHM,label="VHM")
-    plt.plot(xFull,uFD,label="FDM-FDM")
+        plt.plot(xFull,uFD,label="FDM-FDM")
+        plt.plot(xFull,exactSolution(xFull),label="Exact")
+
 
     
 plt.title(example+" loading")
@@ -289,5 +279,5 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+".pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-1.pdf",bbox_inches='tight')
 
