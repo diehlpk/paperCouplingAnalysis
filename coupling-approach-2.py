@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# Coupling using the displacement (Problem (17))
+# Coupling using the stress's first order approximation  (Problem (18))
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
-# @date 02/05/2021
+# @date 03/02/2021
 import numpy as np
 import sys 
 import matplotlib.pyplot as plt
@@ -154,6 +154,8 @@ def CouplingFDFD(n,h):
     M[3*n-1][3*n-3] = h
 
     M *= 1./(2.*h*h)
+
+    #np.savetxt("fd.csv", M, delimiter=",")
     
     return M
 
@@ -168,6 +170,9 @@ def Coupling(n,h):
     fFD =  1./(2.*h*h)
     fPD =  1./(8.*h*h)
 
+    #fFD = 1
+    #fPD = 1
+    #h = 1
     # Boundary
 
     M[0][0] = 1
@@ -181,18 +186,36 @@ def Coupling(n,h):
 
     # Overlapp
 
-    M[n-1][n-1] = -1
-    M[n-1][n+2] = 1
+    # 1
+    #M[n-1][n+4] = -1/2 * h
+    #M[n-1][n+3] = -2 * h
+    #M[n-1][n+2] = 5/2 * h
+    M[n-1][n-1] = 1
+    M[n-1][n+2] =  1
+    #M[n-1][n-3] = 1 * h
 
-    M[n][n] = -1
-    M[n][n-3] = 1
+    # 0.5
+    M[n][n+1] = h
+    M[n][n] = -h 
+    #M[n][n-5] =  1 * h
+    #M[n][n-4] = -4  * h
+    #M[n][n-3] = 3 * h 
 
-    M[n+1][n+1] = -1
-    M[n+1][n-2] = 1
+    # 0.75
+    #M[n+1][n+3] = -1/2 *h
+    #M[n+1][n+2] = -2 * h
+    M[n+1][n+1] = - h
+    M[n+1][n+2] = h  
+    #M[n+1][n-3] = -4 * h
+    #M[n+1][n-4] = 1 * h
+
+    # 1
+    M[n+2[n+2] = h
+    M[n+2][n+3] = h
 
     # PD
 
-    for i in range(n+2,2*n+2):
+    for i in range(n+3,2*n+2):
         M[i][i-2] = -1.  * fPD
         M[i][i-1] = -4. * fPD
         M[i][i] = 10. * fPD
@@ -219,16 +242,20 @@ def Coupling(n,h):
 
     # Boundary
 
+    #h = 0.25
+
     M[3*n+3][3*n+3] = 3*h * fFD
     M[3*n+3][3*n+2] = -4*h * fFD
     M[3*n+3][3*n+1] = h * fFD
+
+    np.savetxt("pd2.csv", M, delimiter=",")
 
     return M
 
 
 markers = ['s','o','x','.']
 
-for i in range(2,6):
+for i in range(2,3):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -248,23 +275,40 @@ for i in range(2,6):
     forceCoupled[nodes-1] = 0
     forceCoupled[nodes] = 0
     forceCoupled[nodes+1] = 0
+    #forceCoupled[nodes+2] = 0
+
 
     forceCoupled[2*nodes+2] = 0
     forceCoupled[2*nodes+3] = 0
     forceCoupled[2*nodes+4] = 0
+    #forceCoupled[2*nodes+5] = 0
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
-    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2],markevery=5)
+    plt.scatter(xFull,uSlice,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2])
+
+    #if i == 5:
+
+        #xFull = np.linspace(0,3.,nodesFull)
+        #print(xFull)
+
+        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+        #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
+        #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
+        #plt.plot(xFull,uFD,label="FDM")
+        #plt.plot(xFull,uVHM,label="VHM")
+        #plt.plot(xFull,uFD,label="FDM-FDM")
+    plt.plot(xFull,exactSolution(xFull),label="Exact")
+
+
     
-plt.title("Example with "+example+" solution for Problem (17)")
+plt.title("Example with "+example+" solution for Problem (18) using $\sigma_1$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 plt.ylabel("Error in displacement")
 
-plt.savefig("coupling-"+example.lower()+"-approach-1.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-2-1.pdf",bbox_inches='tight')
 
