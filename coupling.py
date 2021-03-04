@@ -241,88 +241,9 @@ def CouplingFDVHM(n,h):
     
     return M
 
-#############################################################################
-# Assemble the stiffness matrix for the coupling of FDM - Stress - FDM (Eq. 10)
-#############################################################################
+markers = ['s','o','x','.']
 
-def CouplingFDStress(n,h):
-
-    M = np.zeros([3*n,3*n])
-    
-    M[0][0] = 1 
-
-    for i in range(1,n-1):
-        M[i][i-1] = -2 
-        M[i][i] = 4 
-        M[i][i+1] = -2 
-
-    M[n-1][n-1] = -1 
-    M[n-1][n] = 1  
-
-    M[n][n-1] = 3*h 
-    M[n][n-2] = -4*h 
-    M[n][n-3] = 1*h 
-
-    M[n][n] = 5 *h
-    M[n][n+1] = -4 *h 
-    M[n][n+2] = -1 *h
-
-    M[n+1][n] = 5 *h
-    M[n+1][n+1] = -4 *h 
-    M[n+1][n+2] = -1 *h
-
-
-
-
-    M[n+2][n+1] = -1 
-    M[n+2][n+2] =  2 
-    M[n+2][n+3] = -1 
-
-    for i in range(n+3,2*n-2):
-        M[i][i-2] = -1. 
-        M[i][i-1] = -4. 
-        M[i][i] = 10. 
-        M[i][i+1] =  -4. 
-        M[i][i+2] = -1. 
-
-    M[2*n-2][2*n-3] = -1 
-    M[2*n-2][2*n-2] = 2 
-    M[2*n-2][2*n-1] = -1 
-
-    M[2*n-1][2*n-1] = -1 
-    M[2*n-1][2*n] = 1  
-
-    M[2*n][2*n-1] = 3*h 
-    M[2*n][2*n-2] = -4*h 
-    M[2*n][2*n-3] = 1*h 
-
-    M[2*n][2*n] = 3*h 
-    M[2*n][2*n+1] = -4*h 
-    M[2*n][2*n+2] = 1*h 
-
-    for i in range(2*n+1,3*n-1):
-        M[i][i-1] = -2 
-        M[i][i] = 4 
-        M[i][i+1] = -2 
-
-    M[3*n-1][3*n-1] = 3*h 
-    M[3*n-1][3*n-2] = -4*h 
-    M[3*n-1][3*n-3] = h 
-
-    M *= 1./(2.*h*h)
-
-    #print(M)
-    np.savetxt("pd.csv", M, delimiter=",")
-    #plt.matshow(M)
-    #plt.show()
-    
-    return M
-
-
-
-
-
-for i in range(2,3):
+for i in range(2,6):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -334,6 +255,8 @@ for i in range(2,3):
     x3 = np.linspace(2,3.,nodes)
     x = np.array(np.concatenate((x1,x2,x3)))
 
+    xFull = np.linspace(0,3.,nodesFull)
+
     forceCoupled = forceCoupling(nodes,x)
     forceCoupled[n] = 0
     forceCoupled[n+1] = 0
@@ -341,27 +264,20 @@ for i in range(2,3):
     forceCoupled[2*n+1] = 0
     forceCoupled[2*n+2] = 0
 
+    uSlice = np.array(np.concatenate((x[0:nodes],x[nodes+1:2*nodes],x[2*nodes+1:3*nodes])))
 
-    uFDMVHM = solve(CouplingFDStress(nodes,h),forceCoupled)
-
-    plt.plot(x,uFDMVHM,label=r"FDM-VHM ($\delta$="+str(2*h)+")")
-
-    #if i == 7:
-
-        #xFull = np.linspace(0,3.,nodesFull)
-
-        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-        #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
-    uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
-        #plt.plot(xFull,uFD,label="FDM")
-        #plt.plot(xFull,uVHM,label="VHM")
-    plt.plot(x,uFDFD,label="FDM-FDM")
-
+    uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
+    uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
     
-plt.title(example+" loading")
+    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+    plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2],markevery=5)
+
+plt.title("Example with "+example+" solution for Problem (19)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
+plt.ylabel("Error in displacement w.r.t FDM")
 
-plt.savefig("coupling-"+example.lower()+".pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-vhm.pdf",bbox_inches='tight')
 

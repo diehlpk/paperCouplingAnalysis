@@ -264,7 +264,7 @@ plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement")
+plt.ylabel("Error in displacement w.r.t FDM")
 
 plt.savefig("coupling-"+example.lower()+"-approach-1.pdf",bbox_inches='tight')
 
