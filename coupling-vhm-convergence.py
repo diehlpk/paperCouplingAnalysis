@@ -257,6 +257,69 @@ def CouplingFDVHM(n,h):
     
     return M
 
+
+def CouplingFDVHM4(n,h):
+
+    fVHM = 1./(8.*h*h)
+    fFDM = 1./(2.*h*h)
+
+    M = np.zeros([3*n,3*n])
+    
+    M[0][0] = 1 * fFDM
+
+    for i in range(1,n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 3*h * fFDM
+    M[n][n-2] = -4*h * fFDM
+    M[n][n-3] = 1*h * fFDM
+
+    M[n][n] = 12*h  * fVHM
+    M[n][n+1] = -16*h  * fVHM
+    M[n][n+2] = 4*h  * fVHM
+
+    M[n+1][n] = -8 * fVHM
+    M[n+1][n+1] = 16 * fVHM
+    M[n+1][n+2] = -8 * fVHM
+
+    for i in range(n+2,2*n-2):
+        M[i][i-2] = -1. * fVHM
+        M[i][i-1] = -4. * fVHM
+        M[i][i] = 10. * fVHM
+        M[i][i+1] =  -4. * fVHM
+        M[i][i+2] = -1. * fVHM
+
+    M[2*n-2][2*n-3] = -8 * fVHM
+    M[2*n-2][2*n-2] = 16 * fVHM
+    M[2*n-2][2*n-1] = -8 * fVHM
+
+    M[2*n-1][2*n-1] = -1 
+    M[2*n-1][2*n] = 1  
+
+    M[2*n][2*n-1] = 12*h * fVHM
+    M[2*n][2*n-2] = -16*h * fVHM
+    M[2*n][2*n-3] = 4*h * fVHM
+
+    M[2*n][2*n] = 3*h * fFDM
+    M[2*n][2*n+1] = -4*h * fFDM
+    M[2*n][2*n+2] = 1*h * fFDM
+
+    for i in range(2*n+1,3*n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[3*n-1][3*n-1] = 3*h * fFDM
+    M[3*n-1][3*n-2] = -4*h * fFDM
+    M[3*n-1][3*n-3] = h * fFDM
+    
+    return M
+
 markers = ['s','o','x','.']
 
 for i in range(3,7):
