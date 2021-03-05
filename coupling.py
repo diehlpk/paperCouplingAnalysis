@@ -61,6 +61,24 @@ def forceCoupling(n,x):
     return force
 
 #############################################################################
+# Exact solution 
+#############################################################################
+
+def exactSolution(x):
+    
+    if example == "Cubic":
+        return - x *x * x / 6 + 5.5 * x
+    elif example == "Quartic":
+        return - x * x * x * x / 12 + 10 * x
+    elif example == "Quadratic":
+        return -0.5 * x * x + 4 *x
+    elif example == "Linear":
+        return x
+    else:
+        print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
+        sys.exit()
+
+#############################################################################
 # Assemble the stiffness matrix for the finite difference model (FD)
 #############################################################################
 
@@ -262,20 +280,27 @@ for i in range(3,7):
     forceCoupled[2*n+1] = 0
     forceCoupled[2*n+2] = 0
 
-    uSlice = np.array(np.concatenate((x[0:nodes],x[nodes+1:2*nodes],x[2*nodes+1:3*nodes])))
 
     uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
     
-    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    if example == "Quartic":
 
-    plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.ylabel("Error in displacement")
+    
+    elif i == 3:
+
+        plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.ylabel("Displacement")
 
 plt.title("Example with "+example+" solution for Problem (19)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement w.r.t FDM")
 
 plt.savefig("coupling-"+example.lower()+"-vhm.pdf",bbox_inches='tight')
 

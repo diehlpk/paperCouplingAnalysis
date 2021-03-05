@@ -228,7 +228,7 @@ def Coupling(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(2,6):
+for i in range(3,7):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -258,7 +258,7 @@ for i in range(2,6):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2],markevery=5)
+    plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
     
 plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
