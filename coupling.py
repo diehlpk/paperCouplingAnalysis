@@ -136,8 +136,6 @@ def CouplingFDFD(n,h):
 
     M *= 1./(2.*h*h)
 
-    np.savetxt("fd.csv", M, delimiter=",")
-    
     return M
 
 #############################################################################
@@ -243,7 +241,7 @@ def CouplingFDVHM(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(2,6):
+for i in range(3,7):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -271,7 +269,7 @@ for i in range(2,6):
     
     uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-    plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2],markevery=5)
+    plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
 
 plt.title("Example with "+example+" solution for Problem (19)")
 plt.legend()
