@@ -258,13 +258,22 @@ for i in range(3,7):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+    if example == "Quartic":
+
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.ylabel("Error in displacement w.r.t FDM")
+
+    elif i == 3:
+
+        plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.ylabel("Displacement")
     
 plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement w.r.t FDM")
+
 
 plt.savefig("coupling-"+example.lower()+"-approach-1.pdf",bbox_inches='tight')
 

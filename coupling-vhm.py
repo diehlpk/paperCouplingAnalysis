@@ -257,6 +257,69 @@ def CouplingFDVHM(n,h):
     
     return M
 
+
+def CouplingFDVHM4(n,h):
+
+    fVHM = 1./(8.*h*h)
+    fFDM = 1./(2.*h*h)
+
+    M = np.zeros([3*n,3*n])
+    
+    M[0][0] = 1 * fFDM
+
+    for i in range(1,n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 3*h * fFDM
+    M[n][n-2] = -4*h * fFDM
+    M[n][n-3] = 1*h * fFDM
+
+    M[n][n] = 12*h  * fVHM
+    M[n][n+1] = -16*h  * fVHM
+    M[n][n+2] = 4*h  * fVHM
+
+    M[n+1][n] = -8 * fVHM
+    M[n+1][n+1] = 16 * fVHM
+    M[n+1][n+2] = -8 * fVHM
+
+    for i in range(n+2,2*n-2):
+        M[i][i-2] = -1. * fVHM
+        M[i][i-1] = -4. * fVHM
+        M[i][i] = 10. * fVHM
+        M[i][i+1] =  -4. * fVHM
+        M[i][i+2] = -1. * fVHM
+
+    M[2*n-2][2*n-3] = -8 * fVHM
+    M[2*n-2][2*n-2] = 16 * fVHM
+    M[2*n-2][2*n-1] = -8 * fVHM
+
+    M[2*n-1][2*n-1] = -1 
+    M[2*n-1][2*n] = 1  
+
+    M[2*n][2*n-1] = 12*h * fVHM
+    M[2*n][2*n-2] = -16*h * fVHM
+    M[2*n][2*n-3] = 4*h * fVHM
+
+    M[2*n][2*n] = 3*h * fFDM
+    M[2*n][2*n+1] = -4*h * fFDM
+    M[2*n][2*n+2] = 1*h * fFDM
+
+    for i in range(2*n+1,3*n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[3*n-1][3*n-1] = 3*h * fFDM
+    M[3*n-1][3*n-2] = -4*h * fFDM
+    M[3*n-1][3*n-3] = h * fFDM
+    
+    return M
+
 markers = ['s','o','x','.']
 
 for i in range(3,7):
@@ -281,19 +344,24 @@ for i in range(3,7):
     forceCoupled[2*n+2] = 0
 
 
+    #print(np.array(np.concatenate((x[0:nodes],x[nodes+1:2*nodes],x[2*nodes+1:3*nodes]))))
+
     uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
+    
     
     if example == "Quartic":
 
         uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
         plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
-        plt.ylabel("Error in displacement")
+        plt.ylabel("Error in displacement w.r.t FDM")
+
+        
     
     elif i == 3:
 
-        plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+        plt.plot(xFull,abs(exactSolution(xFull)),label="Exact solution",c="black")
         plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Displacement")
 
