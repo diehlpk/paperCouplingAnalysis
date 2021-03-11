@@ -171,7 +171,7 @@ def Coupling(n,h):
     fPD =  1./(8.*h*h)
 
     #fFD = 1
-    #PD = 1
+    #D = 1
     #h = 1
     # Boundary
 
@@ -193,6 +193,11 @@ def Coupling(n,h):
     # 0.5
     M[n][n+1] = -1 / h
     M[n][n] = 1 / h
+
+    #M[n][n] = 3 / 2 / h
+    #M[n][n+1] = -4 / 2 / h
+    #M[n][n+2] = 1 / 2 / h
+
     M[n][n-5] =  1 / 2 / h
     M[n][n-4] = -4  / 2 / h
     M[n][n-3] = 3 / 2 / h
@@ -200,13 +205,26 @@ def Coupling(n,h):
     # 0.75
     M[n+1][n+1] = 1 / h
     M[n+1][n+2] = -1 / h
+
+    #M[n+1][n+1] = 3 / 2 / h
+    #M[n+1][n+2] = - 4 / 2 / h
+    #M[n+1][n+3] = 1 / 2 / h
+
+
     M[n+1][n-2] = 3 / 2 / h
     M[n+1][n-3] = -4 / 2 / h
     M[n+1][n-4] = 1 / 2 / h
 
     # 1
-    M[n+2][n+2] = 1 / h
-    M[n+2][n+3] = -1 / h
+    #M[n+2][n+2] = 1 / h
+    #M[n+2][n+3] = -1 / h
+
+    M[n+2][n+2] = 3 / 2 / h
+    M[n+2][n+3] = - 4 / 2 / h
+    M[n+2][n+4] = 1 / 2 / h
+
+
+
     M[n+2][n-1] = 3 / 2 / h
     M[n+2][n-2] = -4 / 2 / h
     M[n+2][n-3] = 1 / 2 / h
@@ -229,6 +247,11 @@ def Coupling(n,h):
     # 2.25
     M[2*n+2][2*n+1] = 1 / h
     M[2*n+2][2*n+2] = -1 / h
+
+    #M[2*n+2][2*n+2] = -3 / 2 / h
+    #M[2*n+2][2*n+1] = 4 / 2 / h
+    #M[2*n+2][2*n] = -1 / 2 / h
+
     M[2*n+2][2*n+7] =  -1 / 2 / h
     M[2*n+2][2*n+6] = 4  / 2 / h
     M[2*n+2][2*n+5] = -3  / 2 / h
@@ -236,6 +259,10 @@ def Coupling(n,h):
     # 2.5
     M[2*n+3][2*n+3] = -1 / h
     M[2*n+3][2*n+2] = 1 / h
+    #M[2*n+3][2*n+3] = -3 / 2 / h
+    #M[2*n+3][2*n+2] =  4 / 2 / h
+    #M[2*n+3][2*n+1] = -1 / 2 / h
+
     M[2*n+3][2*n+6] = -3 / 2 / h
     M[2*n+3][2*n+7] = 4 / 2 / h
     M[2*n+3][2*n+8] = -1 / 2 / h
@@ -243,9 +270,15 @@ def Coupling(n,h):
     # 2
     M[2*n+4][2*n+1] = -1 / h
     M[2*n+4][2*n] =  1 / h
-    M[2*n+4][2*n+5] = -3 / 2 / h
-    M[2*n+4][2*n+6] = 4  / 2 / h
-    M[2*n+4][2*n+7] = -1 / 2 / h
+
+    #M[2*n+4][2*n+1] = -3 / 2 / h
+    #M[2*n+4][2*n] = 4 / 2 / h
+    #M[2*n+4][2*n-1] = -1 / 2 / h
+
+
+    M[2*n+4][2*n+4] = -3 / 2 / h
+    M[2*n+4][2*n+5] = 4  / 2 / h
+    M[2*n+4][2*n+6] = -1 / 2 / h
 
 
     # FD
@@ -257,6 +290,7 @@ def Coupling(n,h):
 
     # Boundary
 
+    #M[3*n+3][3*n+3] = 1
     M[3*n+3][3*n+3] = 3*h * fFD
     M[3*n+3][3*n+2] = -4*h * fFD
     M[3*n+3][3*n+1] = h * fFD
@@ -268,7 +302,7 @@ def Coupling(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(2,3):
+for i in range(3,7):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -285,22 +319,27 @@ for i in range(2,3):
   
     forceCoupled = forceCoupling(nodes,x)
 
+    #print(forceCoupled)
+
+    #forceCoupled[nodes-2] = 0
     forceCoupled[nodes-1] = 0
     forceCoupled[nodes] = 0
     forceCoupled[nodes+1] = 0
-    #forceCoupled[nodes+2] = 0
+    forceCoupled[nodes+2] = 0
 
-
+    forceCoupled[2*nodes+1] = 0
     forceCoupled[2*nodes+2] = 0
     forceCoupled[2*nodes+3] = 0
     forceCoupled[2*nodes+4] = 0
-    #forceCoupled[2*nodes+5] = 0
+
+    #print(forceCoupled)
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.scatter(xFull,uSlice,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-2])
+    # -exactSolution(xFull)
+    plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
 
     #if i == 5:
 
@@ -313,7 +352,8 @@ for i in range(2,3):
         #plt.plot(xFull,uFD,label="FDM")
         #plt.plot(xFull,uVHM,label="VHM")
         #plt.plot(xFull,uFD,label="FDM-FDM")
-    plt.plot(xFull,exactSolution(xFull),label="Exact")
+    
+        #plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
 
 
     

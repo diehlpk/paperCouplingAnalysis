@@ -576,7 +576,7 @@ def CouplingFDVHM8(n,h):
 markers = ['s','o','x','.']
 
 
-delta = 0.25
+delta = 0.125
 
 # Case 1  
 h = delta / 2
