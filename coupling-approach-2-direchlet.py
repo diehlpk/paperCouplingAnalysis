@@ -290,8 +290,6 @@ def Coupling(n,h):
     #M[3*n+3][3*n+2] = -4*h * fFD
     #M[3*n+3][3*n+1] = h * fFD
 
-    #np.savetxt("pd2.csv", M, delimiter=",")
-
     return M
 
 
@@ -314,9 +312,6 @@ for i in range(3,7):
   
     forceCoupled = forceCoupling(nodes,x)
 
-    #print(forceCoupled)
-
-    #forceCoupled[nodes-2] = 0
     forceCoupled[nodes-1] = 0
     forceCoupled[nodes] = 0
     forceCoupled[nodes+1] = 0
@@ -327,36 +322,18 @@ for i in range(3,7):
     forceCoupled[2*nodes+3] = 0
     forceCoupled[2*nodes+4] = 0
 
-    #print(forceCoupled)
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    # -exactSolution(xFull)
     plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
-    #plt.plot(xFull,exactSolution(xFull))
-    #if i == 5:
-
-        #xFull = np.linspace(0,3.,nodesFull)
-        #print(xFull)
-
-        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-        #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
-        #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
-        #plt.plot(xFull,uFD,label="FDM")
-        #plt.plot(xFull,uVHM,label="VHM")
-        #plt.plot(xFull,uFD,label="FDM-FDM")
-    
-        #plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
-
-
     
 plt.title("Example with "+example+" solution for Problem (18) using $\sigma_1$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement")
+plt.ylabel("Error in displacement w.r.t exact solution")
 
 plt.savefig("coupling-"+example.lower()+"-approach-2-1-direchlet.pdf",bbox_inches='tight')
 

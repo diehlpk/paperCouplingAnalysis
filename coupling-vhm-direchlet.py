@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Coupling using the displacement (Problem (17)) with two Dirchelt boundary conditions
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 02/05/2021
@@ -34,7 +33,7 @@ def f(x):
     elif example == "Quadratic":
         return 8/9
     else:
-        print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
+        print("Error: Either provide Quadratic, Quartic, or Cubic")
         sys.exit()
 
 def forceFull(n,h):
@@ -50,12 +49,12 @@ def forceFull(n,h):
 
 def forceCoupling(n,x):
     
-    force = np.zeros(3*n+4)
+    force = np.zeros(3*n)
    
-    for i in range(1,3*n+4):
+    for i in range(1,3*n-1):
         force[i] = f(x[i])
     
-    force[3*n+3] = 0
+    force[3*n-1] = 0
     
     return force
 
@@ -72,7 +71,7 @@ def exactSolution(x):
     elif example == "Quadratic":
         return  4/3 * x - 4/9 * x * x
     else:
-        print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
+        print("Error: Either provide Quadratic, Quartic, or Cubic")
         sys.exit()
 
 #############################################################################
@@ -150,78 +149,110 @@ def CouplingFDFD(n,h):
     M[3*n-1][3*n-3] = h
 
     M *= 1./(2.*h*h)
-    
+
     return M
 
 #############################################################################
-# Assemble the stiffness matrix for the coupling of FDM - Displacement - FDM 
+# Assemble the stiffness matrix for the varibale horizon model (VHM)
 #############################################################################
 
-def Coupling(n,h):
+def VHM(n,h):
+        
+    MVHM = np.zeros([n,n])
 
-    M = np.zeros([3*n+4,3*n+4])
+    MVHM[0][0] = 1.
 
-    fFD =  1./(2.*h*h)
-    fPD =  1./(8.*h*h)
+    MVHM[1][0] = -8.
+    MVHM[1][1] = 16.
+    MVHM[1][2] = -8.
 
-    # Boundary
+    for i in range(2,n-2):
+        MVHM[i][i-2] = -1.
+        MVHM[i][i-1] = -4.
+        MVHM[i][i] = 10.
+        MVHM[i][i+1] = -4.
+        MVHM[i][i+2] = -1.
 
-    M[0][0] = 1
 
-    # FD 
+    MVHM[n-2][n-1] = -8.
+    MVHM[n-2][n-2] = 16.
+    MVHM[n-2][n-3] = -8.
+
+    MVHM[n-1][n-1] = 12.*h
+    MVHM[n-1][n-2] = -16.*h
+    MVHM[n-1][n-3] = 4.*h
+
+    MVHM *= 1./(8.*h*h)
+    
+    return  MVHM
+
+
+#############################################################################
+# Assemble the stiffness matrix for the coupling of FDM - VHM - FDM
+#############################################################################
+
+def CouplingFDVHM(n,h):
+
+    fVHM = 1./(8.*h*h)
+    fFDM = 1./(2.*h*h)
+
+    M = np.zeros([3*n,3*n])
+    
+    M[0][0] = 1 * fFDM
 
     for i in range(1,n-1):
-        M[i][i-1] = -2 * fFD
-        M[i][i] = 4 * fFD
-        M[i][i+1] = -2 * fFD
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
 
-    # Overlapp
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
 
-    M[n-1][n-1] = -1
-    M[n-1][n+2] = 1
+    M[n][n-1] = 3*h * fFDM
+    M[n][n-2] = -4*h * fFDM
+    M[n][n-3] = 1*h * fFDM
 
-    M[n][n] = -1
-    M[n][n-3] = 1
+    M[n][n] = 12*h  * fVHM
+    M[n][n+1] = -16*h  * fVHM
+    M[n][n+2] = 4*h  * fVHM
 
-    M[n+1][n+1] = -1
-    M[n+1][n-2] = 1
+    M[n+1][n] = -8 * fVHM
+    M[n+1][n+1] = 16 * fVHM
+    M[n+1][n+2] = -8 * fVHM
 
-    # PD
+    for i in range(n+2,2*n-2):
+        M[i][i-2] = -1. * fVHM
+        M[i][i-1] = -4. * fVHM
+        M[i][i] = 10. * fVHM
+        M[i][i+1] =  -4. * fVHM
+        M[i][i+2] = -1. * fVHM
 
-    for i in range(n+2,2*n+2):
-        M[i][i-2] = -1.  * fPD
-        M[i][i-1] = -4. * fPD
-        M[i][i] = 10. * fPD
-        M[i][i+1] =  -4. * fPD
-        M[i][i+2] = -1. * fPD
+    M[2*n-2][2*n-3] = -8 * fVHM
+    M[2*n-2][2*n-2] = 16 * fVHM
+    M[2*n-2][2*n-1] = -8 * fVHM
 
-    # Overlap
+    M[2*n-1][2*n-1] = -1 
+    M[2*n-1][2*n] = 1  
 
-    M[2*n+2][2*n+2] = -1
-    M[2*n+2][2*n+5] = 1
+    M[2*n][2*n-1] = 12*h * fVHM
+    M[2*n][2*n-2] = -16*h * fVHM
+    M[2*n][2*n-3] = 4*h * fVHM
 
-    M[2*n+3][2*n+3] = -1
-    M[2*n+3][2*n+6] = 1
+    M[2*n][2*n] = 3*h * fFDM
+    M[2*n][2*n+1] = -4*h * fFDM
+    M[2*n][2*n+2] = 1*h * fFDM
 
-    M[2*n+4][2*n+4] = -1
-    M[2*n+4][2*n+1] = 1
+    for i in range(2*n+1,3*n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
 
-    # FD
-
-    for i in range(2*n+5,3*n+3):
-        M[i][i-1] = -2 * fFD
-        M[i][i] = 4 * fFD
-        M[i][i+1] = -2 * fFD
-
-    # Boundary
-
-    M[3*n+3][3*n+3] = 1
-    #M[3*n+3][3*n+3] = 3*h * fFD
-    #M[3*n+3][3*n+2] = -4*h * fFD
-    #M[3*n+3][3*n+1] = h * fFD
-
+    M[3*n-1][3*n-1] = 1
+    #M[3*n-1][3*n-1] = 3*h * fFDM
+    #M[3*n-1][3*n-2] = -4*h * fFDM
+    #M[3*n-1][3*n-3] = h * fFDM
+    
     return M
-
 
 markers = ['s','o','x','.']
 
@@ -233,44 +264,42 @@ for i in range(3,7):
 
     print(nodes,h)
     x1 = np.linspace(0,1,nodes)
-    x2 = np.linspace(1-2*h,2+2*h,nodes+4)
+    x2 = np.linspace(1,2.,nodes)
     x3 = np.linspace(2,3.,nodes)
     x = np.array(np.concatenate((x1,x2,x3)))
 
     xFull = np.linspace(0,3.,nodesFull)
 
-  
     forceCoupled = forceCoupling(nodes,x)
+    forceCoupled[n] = 0
+    forceCoupled[n+1] = 0
 
-    forceCoupled[nodes-1] = 0
-    forceCoupled[nodes] = 0
-    forceCoupled[nodes+1] = 0
+    forceCoupled[2*n+1] = 0
+    forceCoupled[2*n+2] = 0
 
-    forceCoupled[2*nodes+2] = 0
-    forceCoupled[2*nodes+3] = 0
-    forceCoupled[2*nodes+4] = 0
-
-    uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
-    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-
-    uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
-
+    uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
+    uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
+    
+    
     if example == "Quartic" or example == "Cubic":
 
-        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Error in displacement w.r.t exact solution")
 
+        
+    
     elif i == 3:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Displacement")
-    
-plt.title("Example with "+example+" solution for Problem (17)")
+
+plt.title("Example with "+example+" solution for Problem (19)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-
-plt.savefig("coupling-"+example.lower()+"-approach-1-direchlet.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-vhm-direchlet.pdf",bbox_inches='tight')
 
