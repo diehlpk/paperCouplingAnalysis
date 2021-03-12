@@ -13,6 +13,8 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 
+g = -1
+
 
 #############################################################################
 # Solve the system
@@ -27,13 +29,19 @@ def solve(M,f):
 
 def f(x):
     
+    global g 
+
     if example == "Cubic":
-        return x
+        g = 27
+        return -6*x
     elif example == "Quartic":
-        return x*x
+        g = 108
+        return -12 * x*x
     elif example == "Quadratic":
-        return 1
+        g = 6
+        return -2
     elif example == "Linear":
+        g = 1
         return 0
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
@@ -46,7 +54,7 @@ def forceFull(n,h):
     for i in range(1,n-1):
         force[i] = f(i * h)
     
-    force[n-1] = 1
+    force[n-1] = g
     
     return force
 
@@ -57,7 +65,7 @@ def forceCoupling(n,x):
     for i in range(1,3*n+4):
         force[i] = f(x[i])
     
-    force[3*n+3] = 1
+    force[3*n+3] = g
     
     return force
 
@@ -68,11 +76,11 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return - x *x * x / 6 + 5.5 * x
+        return x * x * x
     elif example == "Quartic":
-        return - x * x * x * x / 12 + 10 * x
+        return -12 * x * x
     elif example == "Quadratic":
-        return -0.5 * x * x + 4 *x
+        return x * x
     elif example == "Linear":
         return x
     else:
@@ -228,7 +236,7 @@ def Coupling(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(3,7):
+for i in range(4,8):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -260,13 +268,13 @@ for i in range(3,7):
 
     if example == "Quartic":
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Error in displacement w.r.t FDM")
 
-    elif i == 3:
+    elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Displacement")
     
 plt.title("Example with "+example+" solution for Problem (17)")

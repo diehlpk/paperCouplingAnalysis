@@ -13,6 +13,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 
+g = -1
 
 #############################################################################
 # Solve the system
@@ -27,13 +28,19 @@ def solve(M,f):
 
 def f(x):
     
+    global g 
+
     if example == "Cubic":
-        return x
+        g = 27
+        return -6*x
     elif example == "Quartic":
-        return x*x
+        g = 108
+        return -12 * x*x
     elif example == "Quadratic":
-        return 1
+        g = 6
+        return -2
     elif example == "Linear":
+        g = 1
         return 0
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
@@ -46,7 +53,7 @@ def forceFull(n,h):
     for i in range(1,n-1):
         force[i] = f(i * h)
     
-    force[n-1] = 1
+    force[n-1] = g
     
     return force
 
@@ -57,7 +64,7 @@ def forceCoupling(n,x):
     for i in range(1,3*n+4):
         force[i] = f(x[i])
     
-    force[3*n+3] = 1
+    force[3*n+3] = g
     
     return force
 
@@ -68,11 +75,11 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return - x *x * x / 6 + 5.5 * x
+        return x * x * x
     elif example == "Quartic":
-        return - x * x * x * x / 12 + 10 * x
+        return -12 * x * x
     elif example == "Quadratic":
-        return -0.5 * x * x + 4 *x
+        return x * x
     elif example == "Linear":
         return x
     else:
@@ -216,14 +223,12 @@ def Coupling(n,h):
     M[n+1][n-4] = 1 / 2 / h
 
     # 1
-    #M[n+2][n+2] = 1 / h
-    #M[n+2][n+3] = -1 / h
+    M[n+2][n+2] = 1 / h
+    M[n+2][n+3] = -1 / h
 
-    M[n+2][n+2] = 3 / 2 / h
-    M[n+2][n+3] = - 4 / 2 / h
-    M[n+2][n+4] = 1 / 2 / h
-
-
+    #M[n+2][n+2] = 3 / 2 / h
+    #M[n+2][n+3] = - 4 / 2 / h
+    #M[n+2][n+4] = 1 / 2 / h
 
     M[n+2][n-1] = 3 / 2 / h
     M[n+2][n-2] = -4 / 2 / h
@@ -252,7 +257,7 @@ def Coupling(n,h):
     #M[2*n+2][2*n+1] = 4 / 2 / h
     #M[2*n+2][2*n] = -1 / 2 / h
 
-    M[2*n+2][2*n+7] =  -1 / 2 / h
+    M[2*n+2][2*n+7] =  -1 / 2 / h 
     M[2*n+2][2*n+6] = 4  / 2 / h
     M[2*n+2][2*n+5] = -3  / 2 / h
 
@@ -276,11 +281,6 @@ def Coupling(n,h):
     #M[2*n+4][2*n-1] = -1 / 2 / h
 
 
-    M[2*n+4][2*n+4] = -3 / 2 / h
-    M[2*n+4][2*n+5] = 4  / 2 / h
-    M[2*n+4][2*n+6] = -1 / 2 / h
-
-
     # FD
 
     for i in range(2*n+5,3*n+3):
@@ -290,19 +290,18 @@ def Coupling(n,h):
 
     # Boundary
 
-    #M[3*n+3][3*n+3] = 1
     M[3*n+3][3*n+3] = 3*h * fFD
     M[3*n+3][3*n+2] = -4*h * fFD
     M[3*n+3][3*n+1] = h * fFD
 
-    np.savetxt("pd2.csv", M, delimiter=",")
+    #np.savetxt("pd2.csv", M, delimiter=",")
 
     return M
 
 
 markers = ['s','o','x','.']
 
-for i in range(3,7):
+for i in range(4,8):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -319,9 +318,6 @@ for i in range(3,7):
   
     forceCoupled = forceCoupling(nodes,x)
 
-    #print(forceCoupled)
-
-    #forceCoupled[nodes-2] = 0
     forceCoupled[nodes-1] = 0
     forceCoupled[nodes] = 0
     forceCoupled[nodes+1] = 0
@@ -332,36 +328,30 @@ for i in range(3,7):
     forceCoupled[2*nodes+3] = 0
     forceCoupled[2*nodes+4] = 0
 
-    #print(forceCoupled)
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
+    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    # -exactSolution(xFull)
-    plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+    if example == "Linear":
 
-    #if i == 5:
+        if i == 4 :
 
-        #xFull = np.linspace(0,3.,nodesFull)
-        #print(xFull)
-
-        #uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-        #uVHM = solve(VHM(nodesFull,h),forceFull(nodesFull,h))
-        #uFDFD = solve(CouplingFDFD(nodes,h),forceCoupled)
-        #plt.plot(xFull,uFD,label="FDM")
-        #plt.plot(xFull,uVHM,label="VHM")
-        #plt.plot(xFull,uFD,label="FDM-FDM")
+            plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+            plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
+            plt.ylabel("Displacement")
     
-        #plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
+    else:
 
-
+        plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.ylabel("Error in displacement w.r.t FDM")
     
 plt.title("Example with "+example+" solution for Problem (18) using $\sigma_1$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement")
 
 plt.savefig("coupling-"+example.lower()+"-approach-2-1.pdf",bbox_inches='tight')
 
