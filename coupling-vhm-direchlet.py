@@ -27,7 +27,7 @@ def solve(M,f):
 def f(x):
     
     if example == "Cubic":
-        return -( np.power(2,np.sqrt(3))) * ( -6 + 4*x )
+        return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
         return  - 32 + 64 * x - 64/3 * x * x
     elif example == "Quadratic":
@@ -65,7 +65,7 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return (2/3*np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
+        return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
         return 16 * x*x - 32/3 * x*x*x + 16/9 * x * x * x * x 
     elif example == "Quadratic":
@@ -281,7 +281,7 @@ for i in range(3,7):
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
     
     
-    if example == "Quartic" or example == "Cubic":
+    if example == "Quartic" :
 
         uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 

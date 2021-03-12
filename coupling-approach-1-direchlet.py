@@ -28,7 +28,7 @@ def solve(M,f):
 def f(x):
     
     if example == "Cubic":
-        return -( np.power(2,np.sqrt(3))) * ( -6 + 4*x )
+        return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
         return  - 32 + 64 * x - 64/3 * x * x
     elif example == "Quadratic":
@@ -66,7 +66,7 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return (2/3*np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
+        return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
         return 16 * x*x - 32/3 * x*x*x + 16/9 * x * x * x * x 
     elif example == "Quadratic":
@@ -255,7 +255,7 @@ for i in range(3,7):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    if example == "Quartic" or example == "Cubic":
+    if example == "Quartic" :
 
         plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Error in displacement w.r.t exact solution")

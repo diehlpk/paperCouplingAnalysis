@@ -29,7 +29,7 @@ def solve(M,f):
 def f(x):
     
     if example == "Cubic":
-        return -( np.power(2,np.sqrt(3))) * ( -6 + 4*x )
+        return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
         return  - 32 + 64 * x - 64/3 * x * x
     elif example == "Quadratic":
@@ -67,7 +67,7 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return (2/3*np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
+        return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
         return 16 * x*x - 32/3 * x*x*x + 16/9 * x * x * x * x 
     elif example == "Quadratic":
