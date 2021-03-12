@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coupling using the displacement (Problem (17))
+# Coupling using the displacement (Problem (17)) with two Dirchelt boundary conditions
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 02/05/2021
@@ -28,13 +28,11 @@ def solve(M,f):
 def f(x):
     
     if example == "Cubic":
-        return x
+        return -( np.power(2,np.sqrt(3))) * ( -6 + 4*x )
     elif example == "Quartic":
-        return x*x
+        return  - 32 + 64 * x - 64/3 * x * x
     elif example == "Quadratic":
-        return 1
-    elif example == "Linear":
-        return 0
+        return 8/9
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -46,7 +44,7 @@ def forceFull(n,h):
     for i in range(1,n-1):
         force[i] = f(i * h)
     
-    force[n-1] = 1
+    force[n-1] = 0
     
     return force
 
@@ -57,7 +55,7 @@ def forceCoupling(n,x):
     for i in range(1,3*n+4):
         force[i] = f(x[i])
     
-    force[3*n+3] = 1
+    force[3*n+3] = 0
     
     return force
 
@@ -68,13 +66,11 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return - x *x * x / 6 + 5.5 * x
+        return (2/3*np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
-        return - x * x * x * x / 12 + 10 * x
+        return 16 * x*x - 32/3 * x*x*x + 16/9 * x * x * x * x 
     elif example == "Quadratic":
-        return -0.5 * x * x + 4 *x
-    elif example == "Linear":
-        return x
+        return  4/3 * x - 4/9 * x * x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -219,9 +215,10 @@ def Coupling(n,h):
 
     # Boundary
 
-    M[3*n+3][3*n+3] = 3*h * fFD
-    M[3*n+3][3*n+2] = -4*h * fFD
-    M[3*n+3][3*n+1] = h * fFD
+    M[3*n+3][3*n+3] = 1
+    #M[3*n+3][3*n+3] = 3*h * fFD
+    #M[3*n+3][3*n+2] = -4*h * fFD
+    #M[3*n+3][3*n+1] = h * fFD
 
     return M
 
@@ -258,9 +255,9 @@ for i in range(3,7):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    if example == "Quartic":
+    if example == "Quartic" or example == "Cubic":
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Error in displacement w.r.t FDM")
 
     elif i == 3:
@@ -275,5 +272,5 @@ plt.grid()
 plt.xlabel("$x$")
 
 
-plt.savefig("coupling-"+example.lower()+"-approach-1.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-1-direchlet.pdf",bbox_inches='tight')
 
