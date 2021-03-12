@@ -225,7 +225,7 @@ def Coupling(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(3,7):
+for i in range(4,8):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -257,13 +257,13 @@ for i in range(3,7):
 
     if example == "Quartic" :
 
-        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Error in displacement w.r.t exact solution")
 
-    elif i == 3:
+    elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$="+str(2*h)+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Displacement")
     
 plt.title("Example with "+example+" solution for Problem (17)")
