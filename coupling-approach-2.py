@@ -64,6 +64,7 @@ def forceCoupling(n,x):
     for i in range(1,3*n+4):
         force[i] = f(x[i])
     
+
     force[3*n+3] = g
     
     return force
@@ -77,7 +78,7 @@ def exactSolution(x):
     if example == "Cubic":
         return x * x * x
     elif example == "Quartic":
-        return -12 * x * x
+        return x * x * x * x
     elif example == "Quadratic":
         return x * x
     elif example == "Linear":
@@ -280,6 +281,10 @@ def Coupling(n,h):
     #M[2*n+4][2*n] = 4 / 2 / h
     #M[2*n+4][2*n-1] = -1 / 2 / h
 
+    M[2*n+4][2*n+4] = -3 / 2 / h
+    M[2*n+4][2*n+5] = 4  / 2 / h
+    M[2*n+4][2*n+6] = -1 / 2 / h
+
 
     # FD
 
@@ -338,15 +343,16 @@ for i in range(4,8):
 
         if i == 4 :
 
-            plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
             plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
+            plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
             plt.ylabel("Displacement")
-    
+   
     else:
 
-        plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t FDM")
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.ylabel("Error in displacement w.r.t exact solution")
+        
+
     
 plt.title("Example with "+example+" solution for Problem (18) using $\sigma_1$")
 plt.legend()
