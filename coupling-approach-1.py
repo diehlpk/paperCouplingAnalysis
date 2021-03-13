@@ -78,7 +78,7 @@ def exactSolution(x):
     if example == "Cubic":
         return x * x * x
     elif example == "Quartic":
-        return -12 * x * x
+        return x * x * x * x
     elif example == "Quadratic":
         return x * x
     elif example == "Linear":

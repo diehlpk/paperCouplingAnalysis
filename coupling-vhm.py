@@ -11,6 +11,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 
 example = sys.argv[1]
+solution = sys.argv[2]
 
 g = -1
 
@@ -77,7 +78,7 @@ def exactSolution(x):
     if example == "Cubic":
         return x * x * x
     elif example == "Quartic":
-        return -12 * x * x
+        return x * x * x * x
     elif example == "Quadratic":
         return x * x
     elif example == "Linear":
@@ -289,24 +290,30 @@ for i in range(4,8):
     forceCoupled[2*n+2] = 0
 
 
-    #print(np.array(np.concatenate((x[0:nodes],x[nodes+1:2*nodes],x[2*nodes+1:3*nodes]))))
-
     uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
     
     
     if example == "Quartic":
 
-        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+        if solution == "FDM" :
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t FDM")
+            uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+            plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+            plt.ylabel("Error in displacement w.r.t FDM")
+
+        elif solution == "Exact":
+
+            plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+            plt.ylabel("Error in displacement w.r.t exact solution")
+
 
         
     
     elif i == 4:
 
-        plt.plot(xFull,abs(exactSolution(xFull)),label="Exact solution",c="black")
+        plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
         plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Displacement")
 
@@ -315,5 +322,7 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+"-vhm.pdf",bbox_inches='tight')
-
+if solution == "FDM" :
+    plt.savefig("coupling-"+example.lower()+"-vhm.pdf",bbox_inches='tight')
+else:
+    plt.savefig("coupling-"+example.lower()+"-vhm-exact.pdf",bbox_inches='tight')
