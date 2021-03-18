@@ -102,9 +102,15 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 3*h
-    M[n-1][n-2] = -4*h
-    M[n-1][n-3] = h
+    #M[n-1][n-1] = 3*h
+    #M[n-1][n-2] = -4*h
+    #M[n-1][n-3] = h
+
+    M[n-1][n-1] = 11*h / 3
+    M[n-1][n-2] = -18*h / 3
+    M[n-1][n-3] = 9 * h / 3
+    M[n-1][n-4] = -2 * h / 3
+
 
     M *= 1./(2.*h*h)
 
@@ -227,9 +233,16 @@ def Coupling(n,h):
 
     # Boundary
 
-    M[3*n+3][3*n+3] = 3*h * fFD
-    M[3*n+3][3*n+2] = -4*h * fFD
-    M[3*n+3][3*n+1] = h * fFD
+    #M[3*n+3][3*n+3] = 3*  h * fFD 
+    #M[3*n+3][3*n+2] = -4*h * fFD  
+    #M[3*n+3][3*n+1] = h * fFD 
+
+    M[3*n+3][3*n+3] = 11 *  h * fFD / 3
+    M[3*n+3][3*n+2] =  -18 * h * fFD  / 3
+    M[3*n+3][3*n+1] = 9 * h * fFD / 3
+    M[3*n+3][3*n] = -2 * h * fFD / 3
+
+    #np.savetxt("foo.csv", M, delimiter=",")
 
     return M
 
@@ -268,12 +281,14 @@ for i in range(4,8):
 
     if example == "Quartic":
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        #plt.plot(xFull,uFD)
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Error in displacement w.r.t FDM")
 
     elif i == 4:
 
-        plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+        #plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="blue")
+        plt.plot(xFull,uFD,label="FDM",c="black")
         plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Displacement")
     
