@@ -157,9 +157,11 @@ def CouplingFDFD(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[3*n-1][3*n-1] = 3*h
-    M[3*n-1][3*n-2] = -4*h
-    M[3*n-1][3*n-3] = h
+    M[3*n-1][3*n-1] = 11*h / 3
+    M[3*n-1][3*n-2] = -18*h / 3
+    M[3*n-1][3*n-3] = 9 * h / 3
+    M[3*n-1][3*n-4] = -2 * h / 3
+
 
     M *= 1./(2.*h*h)
 
@@ -260,9 +262,10 @@ def CouplingFDVHM(n,h):
         M[i][i] = 4 * fFDM
         M[i][i+1] = -2 * fFDM
 
-    M[3*n-1][3*n-1] = 3*h * fFDM
-    M[3*n-1][3*n-2] = -4*h * fFDM
-    M[3*n-1][3*n-3] = h * fFDM
+    M[3*n-1][3*n-1] = 11*h * fFDM / 3
+    M[3*n-1][3*n-2] = -18*h * fFDM / 3 
+    M[3*n-1][3*n-3] = 9 * h * fFDM / 3
+    M[3*n-1][3*n-4] = -2 * h * fFDM / 3
     
     return M
 
