@@ -188,41 +188,46 @@ def Coupling(n,h):
     M[n-1][n+2] =  -1
 
     # 0.5
-    M[n][n+1] = -1 / h
-    M[n][n] = 1 / h
+    #M[n][n+1] = -1 / h
+    #M[n][n] = 1 / h
 
-    #M[n][n] = 3 / 2 / h
-    #M[n][n+1] = -4 / 2 / h
-    #M[n][n+2] = 1 / 2 / h
+    M[n][n] = 11 / 6 / h
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
 
-    M[n][n-5] =  1 / 2 / h
-    M[n][n-4] = -4  / 2 / h
-    M[n][n-3] = 3 / 2 / h
+    M[n][n-6] =  -2 / 6 / h
+    M[n][n-5] =  9 / 6 / h
+    M[n][n-4] = -18  / 6 / h
+    M[n][n-3] = 11 / 6 / h
 
     # 0.75
-    M[n+1][n+1] = 1 / h
-    M[n+1][n+2] = -1 / h
+    #M[n+1][n+1] = 1 / h
+    #M[n+1][n+2] = -1 / h
 
-    #M[n+1][n+1] = 3 / 2 / h
-    #M[n+1][n+2] = - 4 / 2 / h
-    #M[n+1][n+3] = 1 / 2 / h
+    M[n+1][n+1] = 11 / 6 / h
+    M[n+1][n+2] = - 18 / 6 / h
+    M[n+1][n+3] = 9 / 6 / h
+    M[n+1][n+4] = -2 / 6 / h
 
-
-    M[n+1][n-2] = 3 / 2 / h
-    M[n+1][n-3] = -4 / 2 / h
-    M[n+1][n-4] = 1 / 2 / h
+    M[n+1][n-2] = 11 / 6 / h
+    M[n+1][n-3] = -18 / 6 / h
+    M[n+1][n-4] = 9 / 6 / h
+    M[n+1][n-5] = -2 / 6 / h
 
     # 1
-    M[n+2][n+2] = 1 / h
-    M[n+2][n+3] = -1 / h
+    #M[n+2][n+2] = 1 / h
+    #M[n+2][n+3] = -1 / h
 
-    #M[n+2][n+2] = 3 / 2 / h
-    #M[n+2][n+3] = - 4 / 2 / h
-    #M[n+2][n+4] = 1 / 2 / h
+    M[n+2][n+2] = 11 / 6 / h
+    M[n+2][n+3] = -18 / 6 / h
+    M[n+2][n+4] = 9 / 6 / h
+    M[n+2][n+5] = -2 / 6 / h
 
-    M[n+2][n-1] = 3 / 2 / h
-    M[n+2][n-2] = -4 / 2 / h
-    M[n+2][n-3] = 1 / 2 / h
+    M[n+2][n-1] = 11 / 6 / h
+    M[n+2][n-2] = -18 / 6 / h
+    M[n+2][n-3] = 9 / 6 / h
+    M[n+2][n-4] = -2 / 6 / h
 
     # PD
 
@@ -240,40 +245,49 @@ def Coupling(n,h):
     M[2*n+1][2*n+4] = 1
 
     # 2.25
-    M[2*n+2][2*n+1] = 1 / h
-    M[2*n+2][2*n+2] = -1 / h
+    #M[2*n+2][2*n+1] = 1 / h
+    #M[2*n+2][2*n+2] = -1 / h
 
-    #M[2*n+2][2*n+2] = -3 / 2 / h
-    #M[2*n+2][2*n+1] = 4 / 2 / h
-    #M[2*n+2][2*n] = -1 / 2 / h
+    M[2*n+2][2*n+2] = -11 / 6 / h
+    M[2*n+2][2*n+1] = 18 / 6 / h
+    M[2*n+2][2*n] = -9 / 6 / h
+    M[2*n+2][2*n-1] = 2 / 6 / h
 
-    M[2*n+2][2*n+7] =  -1 / 2 / h 
-    M[2*n+2][2*n+6] = 4  / 2 / h
-    M[2*n+2][2*n+5] = -3  / 2 / h
 
+    M[2*n+2][2*n+8] =  2 / 6 / h 
+    M[2*n+2][2*n+7] =  -9 / 6 / h 
+    M[2*n+2][2*n+6] = 18  / 6 / h
+    M[2*n+2][2*n+5] = -11  / 6 / h
+
+
+    
     # 2.5
-    M[2*n+3][2*n+3] = -1 / h
-    M[2*n+3][2*n+2] = 1 / h
-    #M[2*n+3][2*n+3] = -3 / 2 / h
-    #M[2*n+3][2*n+2] =  4 / 2 / h
-    #M[2*n+3][2*n+1] = -1 / 2 / h
+    #M[2*n+3][2*n+3] = -1 / h
+    #M[2*n+3][2*n+2] = 1 / h
+ 
+    M[2*n+3][2*n+3] = -11 / 2 / h
+    M[2*n+3][2*n+2] =  18 / 2 / h
+    M[2*n+3][2*n+1] = -9 / 2 / h
+    M[2*n+3][2*n+1] = -9 / 2 / h
 
-    M[2*n+3][2*n+6] = -3 / 2 / h
-    M[2*n+3][2*n+7] = 4 / 2 / h
-    M[2*n+3][2*n+8] = -1 / 2 / h
+    M[2*n+3][2*n+6] = -11 / 6 / h
+    M[2*n+3][2*n+7] = 18 / 6 / h
+    M[2*n+3][2*n+8] = -9 / 6 / h
+    M[2*n+3][2*n+9] = 2 / 6 / h
 
     # 2
-    M[2*n+4][2*n+1] = -1 / h
-    M[2*n+4][2*n] =  1 / h
+    #M[2*n+4][2*n+1] = -1 / h
+    #M[2*n+4][2*n] =  1 / h
 
-    #M[2*n+4][2*n+1] = -3 / 2 / h
-    #M[2*n+4][2*n] = 4 / 2 / h
-    #M[2*n+4][2*n-1] = -1 / 2 / h
+    M[2*n+4][2*n+1] = -11 / 6 / h
+    M[2*n+4][2*n] = 18 / 6 / h
+    M[2*n+4][2*n-1] = -9 / 6 / h
+    M[2*n+4][2*n-2] = 2 / 6 / h
 
-
-    M[2*n+4][2*n+4] = -3 / 2 / h
-    M[2*n+4][2*n+5] = 4  / 2 / h
-    M[2*n+4][2*n+6] = -1 / 2 / h
+    M[2*n+4][2*n+4] = -11 / 6 / h
+    M[2*n+4][2*n+5] = 18  / 6 / h
+    M[2*n+4][2*n+6] = -9 / 6 / h
+    M[2*n+4][2*n+7] = 2 / 6 / h
 
 
     # FD
@@ -322,18 +336,31 @@ for i in range(4,8):
     forceCoupled[2*nodes+3] = 0
     forceCoupled[2*nodes+4] = 0
 
-
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+    if example == "Quartic" :
+
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
     
-plt.title("Example with "+example+" solution for Problem (18) using $\sigma_1$")
+        plt.ylabel("Error in displacement w.r.t exact solution")
+
+    elif i == 4 :
+
+
+        plt.plot(xFull,exactSolution(xFull),c="black",label="Exact")
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.ylabel("Displacement")
+
+
+    
+    
+plt.title("Example with "+example+" solution for Problem (18)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement w.r.t exact solution")
+
 
 plt.savefig("coupling-"+example.lower()+"-approach-2-1-direchlet.pdf",bbox_inches='tight')
 

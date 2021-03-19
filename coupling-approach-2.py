@@ -365,12 +365,12 @@ for i in range(4,8):
    
     else:
 
-        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t exact solution")
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.ylabel("Error in displacement w.r.t FDM")
         
 
     
-plt.title("Example with "+example+" solution for Problem (18) using $\sigma_1$")
+plt.title("Example with "+example+" solution for Problem (18)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
