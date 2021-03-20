@@ -13,7 +13,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 example = sys.argv[1]
 solution = sys.argv[2]
 
-g = -1
+g = -1 
 
 
 #############################################################################
@@ -102,9 +102,11 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 3*h
-    M[n-1][n-2] = -4*h
-    M[n-1][n-3] = h
+    M[n-1][n-1] = 11*h / 3 
+    M[n-1][n-2] = -18*h / 3
+    M[n-1][n-3] = 9* h / 3
+    M[n-1][n-4] = -2* h / 3
+
 
     M *= 1./(2.*h*h)
 
@@ -221,7 +223,7 @@ def CouplingFDVHM(n,h):
         M[i][i+1] = -2 * fFDM
 
     M[n-1][n-1] = -1 
-    M[n-1][n] = 1  
+    M[n-1][n] = 1   
 
     M[n][n-1] = 11*h * fFDM / 3
     M[n][n-2] = -18*h * fFDM / 3

@@ -12,7 +12,8 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 
-
+g = -1
+ 
 #############################################################################
 # Solve the system
 #############################################################################
@@ -26,13 +27,19 @@ def solve(M,f):
 
 def f(x):
     
+    global g 
+
     if example == "Cubic":
-        return x
+        g = 27
+        return -6*x
     elif example == "Quartic":
-        return x*x
+        g = 108
+        return -12 * x*x
     elif example == "Quadratic":
-        return 1
+        g = 6
+        return -2
     elif example == "Linear":
+        g = 1
         return 0
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
@@ -45,7 +52,7 @@ def forceFull(n,h):
     for i in range(1,n-1):
         force[i] = f(i * h)
     
-    force[n-1] = 1
+    force[n-1] = g
     
     return force
 
@@ -56,7 +63,7 @@ def forceCoupling(n,x):
     for i in range(1,3*n-1):
         force[i] = f(x[i])
     
-    force[3*n-1] = 1
+    force[3*n-1] = g
     
     return force
 
@@ -67,11 +74,11 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return - x *x * x / 6 + 5.5 * x
+        return x * x * x
     elif example == "Quartic":
-        return - x * x * x * x / 12 + 10 * x
+        return x * x * x * x
     elif example == "Quadratic":
-        return -0.5 * x * x + 4 *x
+        return x * x
     elif example == "Linear":
         return x
     else:
@@ -93,9 +100,10 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 3*h
-    M[n-1][n-2] = -4*h
-    M[n-1][n-3] = h
+    M[n-1][n-1] = 11*h / 3 
+    M[n-1][n-2] = -18*h / 3
+    M[n-1][n-3] = 9* h / 3
+    M[n-1][n-4] = -2* h / 3
 
     M *= 1./(2.*h*h)
 
@@ -212,13 +220,15 @@ def CouplingFDVHM(n,h):
     M[n-1][n-1] = -1 
     M[n-1][n] = 1  
 
-    M[n][n-1] = 3*h * fFDM
-    M[n][n-2] = -4*h * fFDM
-    M[n][n-3] = 1*h * fFDM
+    M[n][n-1] = 11*h * fFDM / 3
+    M[n][n-2] = -18*h * fFDM / 3
+    M[n][n-3] = 9*h * fFDM / 3
+    M[n][n-4] = -2*h * fFDM / 3
 
-    M[n][n] = 12*h  * fVHM
-    M[n][n+1] = -16*h  * fVHM
-    M[n][n+2] = 4*h  * fVHM
+    M[n][n] = 11 / 6 / h 
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
 
     M[n+1][n] = -8 * fVHM
     M[n+1][n+1] = 16 * fVHM
@@ -238,22 +248,25 @@ def CouplingFDVHM(n,h):
     M[2*n-1][2*n-1] = -1 
     M[2*n-1][2*n] = 1  
 
-    M[2*n][2*n-1] = 12*h * fVHM
-    M[2*n][2*n-2] = -16*h * fVHM
-    M[2*n][2*n-3] = 4*h * fVHM
+    M[2*n][2*n-1] = 11 / 6 / h
+    M[2*n][2*n-2] = -18 / 6 / h
+    M[2*n][2*n-3] = 9 / 6 / h
+    M[2*n][2*n-4] = -2 / 6 / h
 
-    M[2*n][2*n] = 3*h * fFDM
-    M[2*n][2*n+1] = -4*h * fFDM
-    M[2*n][2*n+2] = 1*h * fFDM
+    M[2*n][2*n] = 11*h * fFDM / 3
+    M[2*n][2*n+1] = -18*h * fFDM / 3
+    M[2*n][2*n+2] = 9*h * fFDM / 3
+    M[2*n][2*n+3] = -2*h * fFDM / 3
 
     for i in range(2*n+1,3*n-1):
         M[i][i-1] = -2 * fFDM
         M[i][i] = 4 * fFDM
         M[i][i+1] = -2 * fFDM
 
-    M[3*n-1][3*n-1] = 3*h * fFDM
-    M[3*n-1][3*n-2] = -4*h * fFDM
-    M[3*n-1][3*n-3] = h * fFDM
+    M[3*n-1][3*n-1] = 11*h * fFDM / 3
+    M[3*n-1][3*n-2] = -18*h * fFDM / 3
+    M[3*n-1][3*n-3] = 9* h * fFDM / 3
+    M[3*n-1][3*n-4] = -2* h * fFDM / 3
     
     return M
 
@@ -274,13 +287,15 @@ def CouplingFDVHM4(n,h):
     M[n-1][n-1] = -1 
     M[n-1][n] = 1  
 
-    M[n][n-1] = 3*h * fFDM
-    M[n][n-2] = -4*h * fFDM
-    M[n][n-3] = 1*h * fFDM
+    M[n][n-1] = 11*h * fFDM / 3
+    M[n][n-2] = -18*h * fFDM / 3
+    M[n][n-3] = 9*h * fFDM / 3
+    M[n][n-4] = -2*h * fFDM / 3
 
-    M[n][n] = 12*h  * fVHM
-    M[n][n+1] = -16*h  * fVHM
-    M[n][n+2] = 4*h  * fVHM
+    M[n][n] = 11 / 6 / h 
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
 
 
     # Node with one neighbor
@@ -339,22 +354,25 @@ def CouplingFDVHM4(n,h):
     M[2*n-1][2*n-1] = -1 
     M[2*n-1][2*n] = 1  
 
-    M[2*n][2*n-1] = 12*h * fVHM
-    M[2*n][2*n-2] = -16*h * fVHM
-    M[2*n][2*n-3] = 4*h * fVHM
+    M[2*n][2*n-1] = 11 / 6 / h
+    M[2*n][2*n-2] = -18 / 6 / h
+    M[2*n][2*n-3] = 9 / 6 / h
+    M[2*n][2*n-4] = -2 / 6 / h
 
-    M[2*n][2*n] = 3*h * fFDM
-    M[2*n][2*n+1] = -4*h * fFDM
-    M[2*n][2*n+2] = 1*h * fFDM
+    M[2*n][2*n] = 11*h * fFDM / 3
+    M[2*n][2*n+1] = -18*h * fFDM / 3
+    M[2*n][2*n+2] = 9*h * fFDM / 3
+    M[2*n][2*n+3] = -2*h * fFDM / 3
 
     for i in range(2*n+1,3*n-1):
         M[i][i-1] = -2 * fFDM
         M[i][i] = 4 * fFDM
         M[i][i+1] = -2 * fFDM
 
-    M[3*n-1][3*n-1] = 3*h * fFDM
-    M[3*n-1][3*n-2] = -4*h * fFDM
-    M[3*n-1][3*n-3] = h * fFDM
+    M[3*n-1][3*n-1] = 11*h * fFDM / 3
+    M[3*n-1][3*n-2] = -18*h * fFDM / 3
+    M[3*n-1][3*n-3] = 9* h * fFDM / 3
+    M[3*n-1][3*n-4] = -2* h * fFDM / 3
     
     return M
 
@@ -375,13 +393,15 @@ def CouplingFDVHM8(n,h):
     M[n-1][n-1] = -1 
     M[n-1][n] = 1  
 
-    M[n][n-1] = 3*h * fFDM
-    M[n][n-2] = -4*h * fFDM
-    M[n][n-3] = 1*h * fFDM
+    M[n][n-1] = 11*h * fFDM / 3
+    M[n][n-2] = -18*h * fFDM / 3
+    M[n][n-3] = 9*h * fFDM / 3
+    M[n][n-4] = -2*h * fFDM / 3
 
-    M[n][n] = 12*h  * fVHM
-    M[n][n+1] = -16*h  * fVHM
-    M[n][n+2] = 4*h  * fVHM
+    M[n][n] = 11 / 6 / h 
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
 
 
     # Node with one neighbor
@@ -554,22 +574,25 @@ def CouplingFDVHM8(n,h):
     M[2*n-1][2*n-1] = -1 
     M[2*n-1][2*n] = 1  
 
-    M[2*n][2*n-1] = 12*h * fVHM
-    M[2*n][2*n-2] = -16*h * fVHM
-    M[2*n][2*n-3] = 4*h * fVHM
+    M[2*n][2*n-1] = 11 / 6 / h
+    M[2*n][2*n-2] = -18 / 6 / h
+    M[2*n][2*n-3] = 9 / 6 / h
+    M[2*n][2*n-4] = -2 / 6 / h
 
-    M[2*n][2*n] = 3*h * fFDM
-    M[2*n][2*n+1] = -4*h * fFDM
-    M[2*n][2*n+2] = 1*h * fFDM
+    M[2*n][2*n] = 11*h * fFDM / 3
+    M[2*n][2*n+1] = -18*h * fFDM / 3
+    M[2*n][2*n+2] = 9*h * fFDM / 3
+    M[2*n][2*n+3] = -2*h * fFDM / 3
 
     for i in range(2*n+1,3*n-1):
         M[i][i-1] = -2 * fFDM
         M[i][i] = 4 * fFDM
         M[i][i+1] = -2 * fFDM
 
-    M[3*n-1][3*n-1] = 3*h * fFDM
-    M[3*n-1][3*n-2] = -4*h * fFDM
-    M[3*n-1][3*n-3] = h * fFDM
+    M[3*n-1][3*n-1] = 11*h * fFDM / 3
+    M[3*n-1][3*n-2] = -18*h * fFDM / 3
+    M[3*n-1][3*n-3] = 9* h * fFDM / 3
+    M[3*n-1][3*n-4] = -2* h * fFDM / 3
     
     return M
 
