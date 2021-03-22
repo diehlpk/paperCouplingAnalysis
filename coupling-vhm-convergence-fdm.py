@@ -648,7 +648,7 @@ forceCoupled[nodes] = 0
 forceCoupled[2*nodes-1] = 0
 forceCoupled[2*nodes] = 0
 
-uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
+uFDMVHM = solve(CouplingFDVHM4(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
 
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
@@ -674,7 +674,7 @@ forceCoupled[nodes] = 0
 forceCoupled[2*nodes-1] = 0
 forceCoupled[2*nodes] = 0
 
-uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
+uFDMVHM = solve(CouplingFDVHM8(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
 
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
