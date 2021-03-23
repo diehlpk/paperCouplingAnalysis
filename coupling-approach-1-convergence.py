@@ -12,6 +12,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 
 example = sys.argv[1]
+case = sys.argv[2]
 
 g = -1
 
@@ -335,11 +336,6 @@ def Coupling4(n,h):
     M[3*n+7][3*n+5] = 9 * h * fFD / 3
     M[3*n+7][3*n+4] = -2 * h * fFD / 3
 
-    np.savetxt("foo.csv", M, delimiter=",")
-
-    #plt.matshow(M)
-    #plt.show()
-
     return M
 
 
@@ -495,7 +491,15 @@ forceCoupled[2*nodes+4] = 0
 uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
+if case == "Exact" :
+
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
+
+else: 
+
+    uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    plt.plot(xFull,uSlice-uFDM,c="black",label="m=2",marker=markers[0],markevery=5)
+
 
 # Case 2
 h = delta / 4
@@ -527,9 +531,14 @@ forceCoupled[2*nodes+8] = 0
 uFDMVHM = solve(Coupling4(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],uFDMVHM[2*nodes+9:3*nodes+8])))
 
-#print(np.concatenate((x[0:nodes-1],x[nodes+4:2*nodes+4],x[2*nodes+9:3*nodes+8])))
+if case == "Exact" :
 
-plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
+
+else :
+
+    uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=5)
 
 # Case 3
 h = delta / 8
@@ -567,13 +576,30 @@ forceCoupled[2*nodes+16] = 0
 uFDMVHM = solve(Coupling8(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],uFDMVHM[2*nodes+17:3*nodes+16])))
 
-plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
+if case == "Exact" :
+
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
+
+else :
+
+    uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
+
 
 plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement w.r.t exact solution")
 
-plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-exact.pdf",bbox_inches='tight')
+if case == "Exact" :
+
+    plt.ylabel("Error in displacement w.r.t exact solution")
+    plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-exact.pdf",bbox_inches='tight')
+
+else :
+
+    plt.ylabel("Error in displacement w.r.t exact solution")
+    plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-fdm.pdf",bbox_inches='tight')
+
+    
 
