@@ -403,9 +403,11 @@ forceCoupled[2*nodes+7] = 0
 forceCoupled[2*nodes+8] = 0
 
 uFDMVHM = solve(Coupling4(nodes,h),forceCoupled)
-uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],uFDMVHM[2*nodes+9:3*nodes+8])))
 
-plt.plot(x,uFDMVHM,c="black",label="m=4",marker=markers[1],markevery=5)
+#print(np.concatenate((x[0:nodes-1],x[nodes+4:2*nodes+4],x[2*nodes+9:3*nodes+8])))
+
+plt.plot(xFull,uSlice,c="black",label="m=4",marker=markers[1],markevery=5)
 
 # Case 3
 h = delta / 8
