@@ -58,14 +58,14 @@ def forceFull(n,h):
     
     return force
 
-def forceCoupling(n,x):
+def forceCoupling(n,x,m):
     
-    force = np.zeros(3*n+4)
+    force = np.zeros(3*n+2*m)
    
-    for i in range(1,3*n+4):
+    for i in range(1,3*n+2*m):
         force[i] = f(x[i])
     
-    force[3*n+3] = g
+    force[3*n+2*m-1] = g
     
     return force
 
@@ -248,10 +248,9 @@ def Coupling(n,h):
 
 def Coupling4(n,h):
 
-    M = np.zeros([3*n+4,3*n+4])
+    M = np.zeros([3*n+8,3*n+8])
 
     fFD =  1./(2.*h*h)
-    fPD =  1./(8.*h*h)
 
     # Boundary
 
@@ -267,42 +266,60 @@ def Coupling4(n,h):
     # Overlapp
 
     M[n-1][n-1] = -1
-    M[n-1][n+2] = 1
+    M[n-1][n+4] = 1
 
     M[n][n] = -1
-    M[n][n-3] = 1
+    M[n][n-5] = 1
 
     M[n+1][n+1] = -1
-    M[n+1][n-2] = 1
+    M[n+1][n-4] = 1
 
+    M[n+2][n+2] = -1
+    M[n+2][n-3] = 1
 
+    M[n+3][n+3] = -1
+    M[n+3][n-2] = 1
+
+    #M[n+4][n+4] = -1
+    #M[n+4][n-1] = 1
 
     # PD
 
+    for i in range(n+4,2*n+4):
 
-
-
-    for i in range(n+2,2*n+2):
-        M[i][i-2] = -1.  * fPD
-        M[i][i-1] = -4. * fPD
-        M[i][i] = 10. * fPD
-        M[i][i+1] =  -4. * fPD
-        M[i][i+2] = -1. * fPD
+        M[i][i-4] = -(1./64.)/ 2. / h / h *2
+        M[i][i-3] =  -(1./24.)/ 2. / h / h*2
+        M[i][i-2] = -(1./16.)/ 2. / h / h*2
+        M[i][i-1] = -(1./8.)/ 2. / h / h*2
+        M[i][i] = (47./96.)/ 2. / h / h*2
+        M[i][i+1] =  -(1./8.)/ 2. / h / h*2
+        M[i][i+2] = -(1./16.)/ 2. / h / h*2
+        M[i][i+3] =  -(1./24.)/ 2. / h / h*2
+        M[i][i+4] = -(1./64.)/ 2. / h / h *2
 
     # Overlap
 
-    M[2*n+2][2*n+2] = -1
-    M[2*n+2][2*n+5] = 1
-
-    M[2*n+3][2*n+3] = -1
-    M[2*n+3][2*n+6] = 1
+    #M[2*n+3][2*n+3] = -1
+    #M[2*n+3][2*n+8] = 1
 
     M[2*n+4][2*n+4] = -1
-    M[2*n+4][2*n+1] = 1
+    M[2*n+4][2*n+9] = 1
+
+    M[2*n+5][2*n+5] = -1
+    M[2*n+5][2*n+10] = 1
+
+    M[2*n+6][2*n+6] = -1
+    M[2*n+6][2*n+11] = 1
+
+    M[2*n+7][2*n+7] = -1
+    M[2*n+7][2*n+12] = 1
+
+    M[2*n+8][2*n+8] = -1
+    M[2*n+8][2*n+3] = 1
 
     # FD
 
-    for i in range(2*n+5,3*n+3):
+    for i in range(2*n+9,3*n+7):
         M[i][i-1] = -2 * fFD
         M[i][i] = 4 * fFD
         M[i][i+1] = -2 * fFD
@@ -313,12 +330,15 @@ def Coupling4(n,h):
     #M[3*n+3][3*n+2] = -4*h * fFD  
     #M[3*n+3][3*n+1] = h * fFD 
 
-    M[3*n+3][3*n+3] = 11 *  h * fFD / 3
-    M[3*n+3][3*n+2] =  -18 * h * fFD  / 3
-    M[3*n+3][3*n+1] = 9 * h * fFD / 3
-    M[3*n+3][3*n] = -2 * h * fFD / 3
+    M[3*n+7][3*n+7] = 11 *  h * fFD / 3
+    M[3*n+7][3*n+6] =  -18 * h * fFD  / 3
+    M[3*n+7][3*n+5] = 9 * h * fFD / 3
+    M[3*n+7][3*n+4] = -2 * h * fFD / 3
 
-    #np.savetxt("foo.csv", M, delimiter=",")
+    np.savetxt("foo.csv", M, delimiter=",")
+
+    #plt.matshow(M)
+    #plt.show()
 
     return M
 
@@ -333,24 +353,27 @@ h = delta / 2
 nodes = int(1 / h) + 1
 nodesFull = 3 * nodes
 
+print(nodes,h)
 x1 = np.linspace(0,1,nodes)
-x2 = np.linspace(1,2.,nodes)
+x2 = np.linspace(1-2*h,2+2*h,nodes+4)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
 xFull = np.linspace(0,3.,nodesFull-2)
-forceCoupled = forceCoupling(nodes,x)
+forceCoupled = forceCoupling(nodes,x,2)
+
 forceCoupled[nodes-1] = 0
 forceCoupled[nodes] = 0
+forceCoupled[nodes+1] = 0
 
-forceCoupled[2*nodes-1] = 0
-forceCoupled[2*nodes] = 0
+forceCoupled[2*nodes+2] = 0
+forceCoupled[2*nodes+3] = 0
+forceCoupled[2*nodes+4] = 0
 
-uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
-uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
+uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
+plt.plot(xFull,uSlice,c="black",label="m=2",marker=markers[0],markevery=5)
 
 # Case 2
 h = delta / 4
@@ -358,23 +381,31 @@ nodes = int(1 / h) + 1
 nodesFull = 3 * nodes
 
 x1 = np.linspace(0,1,nodes)
-x2 = np.linspace(1,2.,nodes)
+x2 = np.linspace(1-4*h,2+4*h,nodes+8)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
 xFull = np.linspace(0,3.,nodesFull-2)
-forceCoupled = forceCoupling(nodes,x)
+forceCoupled = forceCoupling(nodes,x,4)
+
+
 forceCoupled[nodes-1] = 0
 forceCoupled[nodes] = 0
+forceCoupled[nodes+1] = 0
+forceCoupled[nodes+2] = 0
+forceCoupled[nodes+3] = 0
 
-forceCoupled[2*nodes-1] = 0
-forceCoupled[2*nodes] = 0
 
-uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
+forceCoupled[2*nodes+4] = 0
+forceCoupled[2*nodes+5] = 0
+forceCoupled[2*nodes+6] = 0
+forceCoupled[2*nodes+7] = 0
+forceCoupled[2*nodes+8] = 0
+
+uFDMVHM = solve(Coupling4(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
 
-plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
+plt.plot(x,uFDMVHM,c="black",label="m=4",marker=markers[1],markevery=5)
 
 # Case 3
 h = delta / 8
@@ -388,18 +419,18 @@ x = np.array(np.concatenate((x1,x2,x3)))
 
 #print(nodesFull)
 #xFull = np.linspace(0,3.,nodesFull-2)
-forceCoupled = forceCoupling(nodes,x)
-forceCoupled[nodes-1] = 0
-forceCoupled[nodes] = 0
+#forceCoupled = forceCoupling(nodes,x)
+#forceCoupled[nodes-1] = 0
+#forceCoupled[nodes] = 0
 
-forceCoupled[2*nodes-1] = 0
-forceCoupled[2*nodes] = 0
+#forceCoupled[2*nodes-1] = 0
+#forceCoupled[2*nodes] = 0
 
  
-uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
+#uFDMVHM = solve(CouplingFDVHM(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
 
-plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
+#plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
 
 plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
