@@ -469,7 +469,7 @@ delta = 0.125
 # Case 1  
 h = delta / 2
 nodes = int(1 / h) + 1
-nodesFull = 3 * nodes
+nodesFull = 3 * nodes - 2 
 
 print(nodes,h)
 x1 = np.linspace(0,1,nodes)
@@ -477,7 +477,7 @@ x2 = np.linspace(1-2*h,2+2*h,nodes+4)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-xFull = np.linspace(0,3.,nodesFull-2)
+xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x,2)
 
 forceCoupled[nodes-1] = 0
@@ -497,21 +497,23 @@ if case == "Exact" :
 
 else: 
 
+    
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFDM,c="black",label="m=2",marker=markers[0],markevery=5)
+    print(len(xFull),len(uFD))
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=5)
 
 
 # Case 2
 h = delta / 4
 nodes = int(1 / h) + 1
-nodesFull = 3 * nodes
+nodesFull = 3 * nodes - 2
 
 x1 = np.linspace(0,1,nodes)
 x2 = np.linspace(1-4*h,2+4*h,nodes+8)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-xFull = np.linspace(0,3.,nodesFull-2)
+xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x,4)
 
 
@@ -543,14 +545,14 @@ else :
 # Case 3
 h = delta / 8
 nodes = int(1 / h) + 1
-nodesFull = 3 * nodes
+nodesFull = 3 * nodes - 2
 
 x1 = np.linspace(0,1,nodes)
 x2 = np.linspace(1-8*h,2+8*h,nodes+16)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-xFull = np.linspace(0,3.,nodesFull-2)
+xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x,8)
 
 forceCoupled[nodes-1] = 0
@@ -598,7 +600,7 @@ if case == "Exact" :
 
 else :
 
-    plt.ylabel("Error in displacement w.r.t exact solution")
+    plt.ylabel("Error in displacement w.r.t FDM")
     plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-fdm.pdf",bbox_inches='tight')
 
     
