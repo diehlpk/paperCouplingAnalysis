@@ -495,7 +495,7 @@ forceCoupled[2*nodes+4] = 0
 uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-plt.plot(xFull,uSlice,c="black",label="m=2",marker=markers[0],markevery=5)
+plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
 
 # Case 2
 h = delta / 4
@@ -529,7 +529,7 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 #print(np.concatenate((x[0:nodes-1],x[nodes+4:2*nodes+4],x[2*nodes+9:3*nodes+8])))
 
-plt.plot(xFull,uSlice,c="black",label="m=4",marker=markers[1],markevery=5)
+plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
 
 # Case 3
 h = delta / 8
@@ -565,9 +565,9 @@ forceCoupled[2*nodes+15] = 0
 forceCoupled[2*nodes+16] = 0
  
 uFDMVHM = solve(Coupling8(nodes,h),forceCoupled)
-#uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],uFDMVHM[2*nodes+17:3*nodes+16])))
 
-plt.plot(x,uFDMVHM,c="black",label="m=8",marker=markers[2],markevery=5)
+plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
 
 plt.title("Example with "+example+" solution for Problem (17)")
 plt.legend()
