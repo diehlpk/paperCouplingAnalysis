@@ -544,7 +544,25 @@ x = np.array(np.concatenate((x1,x2,x3)))
 xFull = np.linspace(0,3.,nodesFull-2)
 forceCoupled = forceCoupling(nodes,x,8)
 
+forceCoupled[nodes-1] = 0
+forceCoupled[nodes] = 0
+forceCoupled[nodes+1] = 0
+forceCoupled[nodes+2] = 0
+forceCoupled[nodes+3] = 0
+forceCoupled[nodes+4] = 0
+forceCoupled[nodes+5] = 0
+forceCoupled[nodes+6] = 0
+forceCoupled[nodes+7] = 0
 
+forceCoupled[2*nodes+8] = 0
+forceCoupled[2*nodes+9] = 0
+forceCoupled[2*nodes+10] = 0
+forceCoupled[2*nodes+11] = 0
+forceCoupled[2*nodes+12] = 0
+forceCoupled[2*nodes+13] = 0
+forceCoupled[2*nodes+14] = 0
+forceCoupled[2*nodes+15] = 0
+forceCoupled[2*nodes+16] = 0
  
 uFDMVHM = solve(Coupling8(nodes,h),forceCoupled)
 #uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uFDMVHM[2*nodes:3*nodes])))
