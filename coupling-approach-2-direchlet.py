@@ -91,9 +91,11 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 3*h
-    M[n-1][n-2] = -4*h
-    M[n-1][n-3] = h
+    
+    M[n-1][n-1] = 1
+    #M[n-1][n-1] = 3*h
+    #M[n-1][n-2] = -4*h
+    #M[n-1][n-3] = h
 
     M *= 1./(2.*h*h)
 
@@ -337,14 +339,15 @@ for i in range(4,8):
     forceCoupled[2*nodes+4] = 0
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
+    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
     if example == "Quartic" :
 
-        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
     
-        plt.ylabel("Error in displacement w.r.t exact solution")
+        plt.ylabel("Error in displacement w.r.t FDM")
 
     elif i == 4 :
 
