@@ -504,29 +504,101 @@ def Coupling8(n,h):
     M[n-1][n-1] = -1
     M[n-1][n+8] = 1
 
-    M[n][n] = -1
-    M[n][n-9] = 1
+    #
+    M[n][n+2] = -2 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+1] = -18 / 6 / h
+    M[n][n] = 11 / 6 / h
 
-    M[n+1][n+1] = -1
-    M[n+1][n-8] = 1
+    M[n][n-9] = 11 / 6 / h
+    M[n][n-10] =  -18 / 6 / h
+    M[n][n-11] = 9 / 6 / h
+    M[n][n-12] = -2 / 6 / h
 
-    M[n+2][n+2] = -1
-    M[n+2][n-7] = 1
+    #
 
-    M[n+3][n+3] = -1
-    M[n+3][n-6] = 1
+    M[n+1][n+4] = -2 / 6 / h
+    M[n+1][n+3] = 9 / 6 / h
+    M[n+1][n+2] = -18 / 6 / h
+    M[n+1][n+1] = 11 / 6 / h
 
-    M[n+4][n+4] = -1
-    M[n+4][n-5] = 1
+    M[n+1][n-8] =  11 / 6 / h
+    M[n+1][n-9] =  -18 / 6 / h
+    M[n+1][n-10] = 9 / 6 / h
+    M[n+1][n-11] = -2 / 6 / h
 
-    M[n+5][n+5] = -1
-    M[n+5][n-4] = 1
+    #
 
-    M[n+6][n+6] = -1
-    M[n+6][n-3] = 1
+    M[n+2][n+5] = -2 / 6 / h
+    M[n+2][n+4] = 9 / 6 / h
+    M[n+2][n+3] = -18 / 6 / h
+    M[n+2][n+2] = 11 / 6 / h
 
-    M[n+7][n+7] = -1
-    M[n+7][n-2] = 1
+    M[n+2][n-7] = 11 / 6 / h
+    M[n+2][n-6] = -18 / 6 / h
+    M[n+2][n-5] = 9 / 6 / h
+    M[n+2][n-4] = -2 / 6 / h
+
+    #
+
+    M[n+3][n+6] = -2 / 6 / h
+    M[n+3][n+5] = 9 / 6 / h
+    M[n+3][n+4] = -18 / 6 / h
+    M[n+3][n+3] = 11 / 6 / h
+
+    M[n+3][n-6] = 11 / 6 / h
+    M[n+3][n-5] = -18 / 6 / h
+    M[n+3][n-4] = 9 / 6 / h
+    M[n+3][n-3] = -2 / 6 / h
+
+    #
+
+    M[n+4][n+7] = -2 / 6 / h
+    M[n+4][n+6] = 9 / 6 / h
+    M[n+4][n+5] = -18 / 6 / h
+    M[n+4][n+4] = 11 / 6 / h
+
+    M[n+4][n-5] = 11 / 6 / h
+    M[n+4][n-4] = -18 / 6 / h
+    M[n+4][n-3] = 9 / 6 / h
+    M[n+4][n-2] = -2 / 6 / h
+
+    #
+
+    M[n+5][n+8] = -2 / 6 / h
+    M[n+5][n+7] = 9 / 6 / h
+    M[n+5][n+6] = -18 / 6 / h
+    M[n+5][n+5] = 11 / 6 / h
+
+    M[n+5][n-4] = 11 / 6 / h
+    M[n+5][n-3] = -18 / 6 / h
+    M[n+5][n-2] = 9 / 6 / h
+    M[n+5][n-1] = -2 / 6 / h
+
+    #
+
+    M[n+6][n+9] = -2 / 6 / h
+    M[n+6][n+8] = 9 / 6 / h
+    M[n+6][n+7] = -18 / 6 / h
+    M[n+6][n+6] = 11 / 6 / h
+
+    M[n+6][n-3] = 11 / 6 / h
+    M[n+6][n-2] = -18 / 6 / h
+    M[n+6][n-1] = 9 / 6 / h
+    M[n+6][n] =  -2 / 6 / h
+
+
+    #
+
+    M[n+7][n+10] = -2 / 6 / h
+    M[n+7][n+9] = 9 / 6 / h
+    M[n+7][n+8] = -18 / 6 / h
+    M[n+7][n+7] = 11 / 6 / h
+
+    M[n+7][n-2] = 11 / 6 / h
+    M[n+7][n-3] = -18 / 6 / h
+    M[n+7][n-4] = 9 / 6 / h
+    M[n+7][n-5] =  -2 / 6 / h
 
     # PD
 
@@ -554,29 +626,101 @@ def Coupling8(n,h):
     M[2*n+8][2*n+8] = -1
     M[2*n+8][2*n+17] = 1
 
-    M[2*n+9][2*n+9] = -1
-    M[2*n+9][2*n+18] = 1
+    #
+    
+    M[2*n+9][2*n+6] = 2 / 6 / h
+    M[2*n+9][2*n+7] = -9 / 6 / h
+    M[2*n+9][2*n+8] = 18 / 6 / h
+    M[2*n+9][2*n+9] = -11 / 6 / h
 
-    M[2*n+10][2*n+10] = -1
-    M[2*n+10][2*n+19] = 1
+    M[2*n+9][2*n+18] =  -11 / 6 / h
+    M[2*n+9][2*n+19] = 18 / 6 / h
+    M[2*n+9][2*n+20] =  -9 / 6 / h
+    M[2*n+9][2*n+21] = 2 / 6 / h
 
-    M[2*n+11][2*n+11] = -1
-    M[2*n+11][2*n+20] = 1
+    #
 
-    M[2*n+12][2*n+12] = -1
-    M[2*n+12][2*n+21] = 1
+    M[2*n+10][2*n+7] = 2 / 6 / h
+    M[2*n+10][2*n+8] = -9 / 6 / h
+    M[2*n+10][2*n+9] =  -18 / 6 / h
+    M[2*n+10][2*n+10] = -11 / 6 / h
 
-    M[2*n+13][2*n+13] = -1
-    M[2*n+13][2*n+22] = 1
+    M[2*n+10][2*n+19] = -11 / 6 / h
+    M[2*n+10][2*n+20] = 18 / 6 / h
+    M[2*n+10][2*n+21] = -9 / 6 / h
+    M[2*n+10][2*n+22] = 2 / 6 / h
 
-    M[2*n+14][2*n+14] = -1
-    M[2*n+14][2*n+23] = 1
+    #
 
-    M[2*n+15][2*n+15] = -1
-    M[2*n+15][2*n+24] = 1
+    M[2*n+11][2*n+8] = 2 / 6 / h
+    M[2*n+11][2*n+9] = -9 / 6 / h
+    M[2*n+11][2*n+10] = 18 / 6 / h
+    M[2*n+11][2*n+11] = -11 / 6 / h
 
-    M[2*n+16][2*n+16] = -1
-    M[2*n+16][2*n+7] = 1
+    M[2*n+11][2*n+20] = -11 / 6 / h
+    M[2*n+11][2*n+21] = 18 / 6 / h
+    M[2*n+11][2*n+22] = -9 / 6 / h
+    M[2*n+11][2*n+23] = 2 / 6 / h
+
+    #
+
+    M[2*n+12][2*n+9] = -2 / 6 / h
+    M[2*n+12][2*n+10] = -9 / 6 / h
+    M[2*n+12][2*n+11] = 18 / 6 / h
+    M[2*n+12][2*n+12] = -11 / 6 / h
+
+    M[2*n+12][2*n+21] = -11 / 6 / h
+    M[2*n+12][2*n+22] = 18 / 6 / h
+    M[2*n+12][2*n+23] = -9 / 6 / h
+    M[2*n+12][2*n+24] = 2 / 6 / h
+
+    #
+
+    M[2*n+13][2*n+10] = 2 / 6 / h
+    M[2*n+13][2*n+11] =  -9 / 6 / h
+    M[2*n+13][2*n+12] = 18 / 6 / h
+    M[2*n+13][2*n+13] = -11 / 6 / h
+
+    M[2*n+13][2*n+22] = -11 / 6 / h
+    M[2*n+13][2*n+23] = 18 / 6 / h
+    M[2*n+13][2*n+24] = -9 / 6 / h
+    M[2*n+13][2*n+25] = 2 / 6 / h
+
+    #
+
+    M[2*n+14][2*n+11] = 2 / 6 / h
+    M[2*n+14][2*n+12] = -9 / 6 / h
+    M[2*n+14][2*n+13] = 18 / 6 / h
+    M[2*n+14][2*n+14] = -11 / 6 / h
+
+    M[2*n+14][2*n+23] = -11 / 6 / h
+    M[2*n+14][2*n+24] = 18 / 6 / h
+    M[2*n+14][2*n+25] = -9 / 6 / h
+    M[2*n+14][2*n+26] = 2 / 6 / h
+
+    #
+
+    M[2*n+15][2*n+12] =  2 / 6 / h
+    M[2*n+15][2*n+13] = -9 / 6 / h
+    M[2*n+15][2*n+14] = 18 / 6 / h
+    M[2*n+15][2*n+15] = -11 / 6 / h
+
+    M[2*n+15][2*n+24] = -11 / 6 / h
+    M[2*n+15][2*n+25] = 18 / 6 / h
+    M[2*n+15][2*n+26] = -9 / 6 / h
+    M[2*n+15][2*n+27] = 2 / 6 / h
+    
+    #
+
+    M[2*n+16][2*n+13] = 2 / 6 / h
+    M[2*n+16][2*n+14] = -9 / 6 / h
+    M[2*n+16][2*n+15] = 18 / 6 / h
+    M[2*n+16][2*n+16] = -11 / 6 / h
+
+    M[2*n+16][2*n+7] = -11 / 6 / h
+    M[2*n+16][2*n+8] = 18 / 6 / h
+    M[2*n+16][2*n+9] = -9 / 6 / h
+    M[2*n+16][2*n+10] = 2 / 6 / h
 
     # FD
 
@@ -598,11 +742,7 @@ def Coupling8(n,h):
 
     np.savetxt("foo.csv", M, delimiter=",")
 
-    #plt.matshow(M)
-    #plt.show()
-
     return M
-
 
 markers = ['s','o','x','.']
 
@@ -685,6 +825,51 @@ else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
     plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=5)
+
+# Case 3
+h = delta / 8
+nodes = int(1 / h) + 1
+nodesFull = 3 * nodes - 2
+
+x1 = np.linspace(0,1,nodes)
+x2 = np.linspace(1-8*h,2+8*h,nodes+16)
+x3 = np.linspace(2,3.,nodes)
+x = np.array(np.concatenate((x1,x2,x3)))
+
+xFull = np.linspace(0,3.,nodesFull)
+forceCoupled = forceCoupling(nodes,x,8)
+
+forceCoupled[nodes-1] = 0
+forceCoupled[nodes] = 0
+forceCoupled[nodes+1] = 0
+forceCoupled[nodes+2] = 0
+forceCoupled[nodes+3] = 0
+forceCoupled[nodes+4] = 0
+forceCoupled[nodes+5] = 0
+forceCoupled[nodes+6] = 0
+forceCoupled[nodes+7] = 0
+
+forceCoupled[2*nodes+8] = 0
+forceCoupled[2*nodes+9] = 0
+forceCoupled[2*nodes+10] = 0
+forceCoupled[2*nodes+11] = 0
+forceCoupled[2*nodes+12] = 0
+forceCoupled[2*nodes+13] = 0
+forceCoupled[2*nodes+14] = 0
+forceCoupled[2*nodes+15] = 0
+forceCoupled[2*nodes+16] = 0
+ 
+uFDMVHM = solve(Coupling8(nodes,h),forceCoupled)
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],uFDMVHM[2*nodes+17:3*nodes+16])))
+
+if case == "Exact" :
+
+    plt.plot(xFull,uSlice,c="black",label="m=8",marker=markers[2],markevery=5)
+
+else :
+
+    uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
 
 
 
