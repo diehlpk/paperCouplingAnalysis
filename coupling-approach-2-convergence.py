@@ -13,6 +13,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 case = sys.argv[2]
+factor = sys.argv[3]
 
 g = -1
 
@@ -377,9 +378,7 @@ def Coupling4(n,h):
     M[n+2][n-5] = 9 / 6 / h
     M[n+2][n-6] = -2 / 6 / h 
 
-    #
-
-    M[n+3][n+3] = 11 / 6 / h
+    M[n+3][n+3] =  11 / 6 / h
     M[n+3][n+4] = -18 / 6 / h
     M[n+3][n+5] = 9 / 6 / h
     M[n+3][n+6] = -2 / 6 / h 
@@ -765,7 +764,7 @@ def Coupling8(n,h):
 
 markers = ['s','o','x','.']
 
-delta = 0.125
+delta = 1 / float(factor)
 
 # Case 1  
 h = delta / 2
@@ -891,7 +890,7 @@ else :
 
 
 
-plt.title("Example with "+example+" solution for Problem (18)")
+plt.title("Example with "+example+" solution for Problem (18) \n $\delta=(1/$"+str(factor)+")")
 plt.legend()
 plt.grid()
 
@@ -903,4 +902,4 @@ if case == "Exact" :
 else :
 
     plt.ylabel("Error in displacement w.r.t FDM")
-    plt.savefig("coupling-"+example.lower()+"-approach-2-convergence-fdm.pdf",bbox_inches='tight')
+    plt.savefig("coupling-"+example.lower()+"-approach-2-convergence-fdm-"+factor+".pdf",bbox_inches='tight')
