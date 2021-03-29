@@ -31,7 +31,7 @@ def f(x):
     if example == "Cubic":
         return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
-        return  - 32 + 64 * x - 64/3 * x * x
+        return  -32/9 + 64/9 * x - 64/27 * x * x
     elif example == "Quadratic":
         return 8/9
     else:
@@ -69,7 +69,7 @@ def exactSolution(x):
     if example == "Cubic":
         return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
-        return 16 * x*x - 32/3 * x*x*x + 16/9 * x * x * x * x 
+        return 16/9 * x * x - 32/27 * x * x * x + 16/81 * x * x * x * x
     elif example == "Quadratic":
         return  4/3 * x - 4/9 * x * x
     else:
