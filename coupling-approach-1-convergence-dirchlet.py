@@ -31,7 +31,7 @@ def f(x):
     if example == "Cubic":
         return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
-        return  - 32 + 64 * x - 64/3 * x * x
+        return -32/9 + 64/9 * x - 64/27 * x * x
     elif example == "Quadratic":
         return 8/9
     else:

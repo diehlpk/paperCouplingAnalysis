@@ -29,7 +29,7 @@ def f(x):
     if example == "Cubic":
         return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
-        return  -32/9 + 64/9 * x - 64/27 * x * x
+        return  -32/9 + 64/9 * x - 64/27 * x * x 
     elif example == "Quadratic":
         return 8/9
     else:
@@ -594,7 +594,7 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
+print(nodes,h)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
@@ -620,7 +620,7 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
+print(nodes,h)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
@@ -646,7 +646,7 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
+print(nodes,h)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 
