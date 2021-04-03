@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coupling using the stress's first order approximation  (Problem (18))
+# Coupling using the stress's first order approximation  (MSCM)
 # using Dirchelt boundary conditons x=0 and x=3
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
@@ -359,7 +359,7 @@ for i in range(4,8):
 
     
     
-plt.title("Example with "+example+" solution for Problem (18)")
+plt.title("Example with "+example+" solution for MSCM")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

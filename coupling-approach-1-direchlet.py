@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coupling using the displacement (Problem (17)) with two Dirchelt boundary conditions
+# Coupling using MDCM with two Dirichelt boundary conditions
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 02/05/2021
@@ -268,7 +268,7 @@ for i in range(4,8):
         plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=5)
         plt.ylabel("Displacement")
     
-plt.title("Example with "+example+" solution for Problem (17)")
+plt.title("Example with "+example+" solution for MDCM")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

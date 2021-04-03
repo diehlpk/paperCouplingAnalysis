@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Coupling using a variable horizon (VHCM)
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 02/05/2021
@@ -679,7 +680,7 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 
 plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
 
-plt.title("Example with "+example+" solution for Problem (19)")
+plt.title("Example with "+example+" solution for VHCM")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

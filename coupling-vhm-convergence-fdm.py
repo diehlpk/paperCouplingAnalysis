@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Coupling using a variable horizon (VHCM)
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 02/05/2021
@@ -687,7 +688,7 @@ uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
 plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
 
-plt.title("Example with "+example+" solution for Problem (19) \n $\delta=(1/$"+str(factor)+")")
+plt.title("Example with "+example+" solution for VHCM \n $\delta=(1/$"+str(factor)+")")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

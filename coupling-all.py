@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coupling using the stress's first order approximation  (MSCM)
+# Plot the solution of all approaches in one plot
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 03/02/2021
@@ -164,7 +164,9 @@ def CouplingFDFD(n,h):
     M[3*n-1][3*n-3] = h
 
     M *= 1./(2.*h*h)
- 
+
+    #np.savetxt("fd.csv", M, delimiter=",")
+    
     return M
 
 #############################################################################
@@ -177,6 +179,11 @@ def Coupling(n,h):
 
     fFD =  1./(2.*h*h)
     fPD =  1./(8.*h*h)
+
+    #fFD = 1
+    #D = 1
+    #h = 1
+    # Boundary
 
     M[0][0] = 1
 
@@ -194,6 +201,9 @@ def Coupling(n,h):
     M[n-1][n+2] =  -1
 
     # 0.5
+    #M[n][n+1] = -1 / h
+    #M[n][n] = 1 / h
+
     M[n][n] = 11 / 6 / h
     M[n][n+1] = -18 / 6 / h
     M[n][n+2] = 9 / 6 / h
@@ -205,6 +215,9 @@ def Coupling(n,h):
     M[n][n-3] = 11 / 6 / h
 
     # 0.75
+    #M[n+1][n+1] = 1 / h
+    #M[n+1][n+2] = -1 / h
+
     M[n+1][n+1] = 11 / 6 / h
     M[n+1][n+2] = - 18 / 6 / h
     M[n+1][n+3] = 9 / 6 / h
@@ -217,6 +230,9 @@ def Coupling(n,h):
     M[n+1][n-5] = -2 / 6 / h
 
     # 1
+    #M[n+2][n+2] = 1 / h
+    #M[n+2][n+3] = -1 / h
+
     M[n+2][n+2] = 11 / 6 / h
     M[n+2][n+3] = -18 / 6 / h
     M[n+2][n+4] = 9 / 6 / h
@@ -243,6 +259,9 @@ def Coupling(n,h):
     M[2*n+1][2*n+4] = 1
 
     # 2.25
+    #M[2*n+2][2*n+1] = 1 / h
+    #M[2*n+2][2*n+2] = -1 / h
+
     M[2*n+2][2*n+2] = -11 / 6 / h
     M[2*n+2][2*n+1] = 18 / 6 / h
     M[2*n+2][2*n] = -9 / 6 / h
@@ -255,6 +274,8 @@ def Coupling(n,h):
     M[2*n+2][2*n+5] = -11  / 6 / h
 
     # 2.5
+    #M[2*n+3][2*n+3] = -1 / h
+    #M[2*n+3][2*n+2] = 1 / h
 
     M[2*n+3][2*n+3] = -11 / 2 / h
     M[2*n+3][2*n+2] =  18 / 2 / h
@@ -267,6 +288,8 @@ def Coupling(n,h):
     M[2*n+3][2*n+9] = 2 / 6 / h
 
     # 2
+    #M[2*n+4][2*n+1] = -1 / h
+    #M[2*n+4][2*n] =  1 / h
 
     M[2*n+4][2*n+1] = -11 / 6 / h
     M[2*n+4][2*n] = 18 / 6 / h
@@ -294,7 +317,7 @@ def Coupling(n,h):
     M[3*n+3][3*n]  = -2 / 6 / h
 
 
-    np.savetxt("pd2.csv", M, delimiter=",")
+    #np.savetxt("pd2.csv", M, delimiter=",")
 
     return M
 
@@ -349,7 +372,7 @@ for i in range(4,8):
         
 
     
-plt.title("Example with "+example+" solution for MSCM")
+plt.title("Example with "+example+" solution for Problem (18)")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

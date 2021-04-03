@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coupling using the stress's first order approximation  (Problem (18))
+# Coupling using the stress's first order approximation  (MSCM)
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 03/02/2021
@@ -890,7 +890,7 @@ else :
 
 
 
-plt.title("Example with "+example+" solution for Problem (18) \n $\delta=(1/$"+str(factor)+")")
+plt.title("Example with "+example+" solution for MSCM \n $\delta=(1/$"+str(factor)+")")
 plt.legend()
 plt.grid()
 

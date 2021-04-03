@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Coupling using the displacement (Problem (17)) for m-convergence
+# Coupling using MDCM for m-convergence
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
 # @date 02/05/2021
@@ -553,7 +553,7 @@ else :
     plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
 
 
-plt.title("Example with "+example+" solution for Problem (17) \n $\delta=(1/$"+str(factor)+")")
+plt.title("Example with "+example+" solution for MDCM \n $\delta=(1/$"+str(factor)+")")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
