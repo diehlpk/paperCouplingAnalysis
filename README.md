@@ -6,10 +6,15 @@
 
 ## Files
 
-* coupling-vhm.py - Coupling FDM and VHM
-* coupling-vhm-convergence.py - Coupling FDM and VHM (m-convergence)
-* coupling-approach-1.py - Coupling FDM and PDM using displacement
-* coupling-approach-2.py - Coupling FDM and PDM using stress
+* coupling-vhm.py - VHCM
+* coupling-vhm-convergence.py - VHCM (m-convergence)
+* coupling-vhm-direchlet.py - VHCM (direchlet)
+* coupling-approach-1.py - MDCM
+* coupling-approcah-1-convergence.py - MDCM (m-convergence)
+* coupling-approach-1-direchlet.py - MDCM (dirichlet) 
+* coupling-approach-2.py - MSCM 
+* coupling-approach-2-dirichlet.py - MSCM (dirichlet) 
+* coupling-approach-2-convergence.py - MSCM (m-convergnece)
 
 ## Usage
 
