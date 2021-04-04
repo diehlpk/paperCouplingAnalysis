@@ -232,24 +232,20 @@ def Coupling(n,h):
         M[i][i+1] = -2 * fFD
 
     # Boundary
-
-    #M[3*n+3][3*n+3] = 3*  h * fFD 
-    #M[3*n+3][3*n+2] = -4*h * fFD  
-    #M[3*n+3][3*n+1] = h * fFD 
-
+ 
     M[3*n+3][3*n+3] = 11 *  h * fFD / 3
     M[3*n+3][3*n+2] =  -18 * h * fFD  / 3
     M[3*n+3][3*n+1] = 9 * h * fFD / 3
     M[3*n+3][3*n] = -2 * h * fFD / 3
 
-    #np.savetxt("foo.csv", M, delimiter=",")
+    np.savetxt("foo.csv", M, delimiter=",")
 
     return M
 
 
 markers = ['s','o','x','.']
 
-for i in range(4,8):
+for i in range(4,5):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1

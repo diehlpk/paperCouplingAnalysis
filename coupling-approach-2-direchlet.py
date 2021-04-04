@@ -355,6 +355,7 @@ for i in range(4,8):
         plt.plot(xFull,exactSolution(xFull),c="black",label="Exact")
         plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Displacement")
+        np.savetxt("coupling-"+example.lower()+"-approach-2-direchlet.csv",uSlice)    
 
 
     
