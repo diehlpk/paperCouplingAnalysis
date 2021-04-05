@@ -7,6 +7,7 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
@@ -489,7 +490,7 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uF
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=4)
 
 else: 
 
@@ -531,7 +532,7 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=8)
 
 else :
 
@@ -578,27 +579,27 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=16)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=4)
 
-
-plt.title("Example with "+example+" solution for MDCM \n $\delta=(1/$"+str(factor)+")")
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
+plt.title("Example with "+example.lower()+" solution for MDCM $\delta=(1/$"+str(factor)+")")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
 if case == "Exact" :
 
-    plt.ylabel("Error in displacement w.r.t exact solution")
+    plt.ylabel("Error in displacement w.r.t, exact solution")
     plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-exact-"+str(factor)+".pdf",bbox_inches='tight')
 
 else :
 
-    plt.ylabel("Error in displacement w.r.t FDM")
+    plt.ylabel("Error in displacement w.r.t, FDM")
     plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-fdm-"+str(factor)+".pdf",bbox_inches='tight')
 
     

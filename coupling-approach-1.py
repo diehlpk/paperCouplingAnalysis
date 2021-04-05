@@ -7,6 +7,7 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
@@ -245,7 +246,7 @@ def Coupling(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(4,5):
+for i in range(4,8):
     n = np.power(2,i)
     h = 1./n
     nodes = n + 1
@@ -277,17 +278,18 @@ for i in range(4,5):
 
     if example == "Quartic":
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t FDM")
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=4)
+        plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
 
         plt.plot(xFull,uFD,label="FDM",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=4)
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
-    
-plt.title("Example with "+example+" solution for MDCM")
+
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f')) 
+plt.title("Example with "+example.lower()+" solution for MDCM with $m=2$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
