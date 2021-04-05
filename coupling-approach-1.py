@@ -285,6 +285,7 @@ for i in range(4,5):
         plt.plot(xFull,uFD,label="FDM",c="black")
         plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Displacement")
+        np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
     
 plt.title("Example with "+example+" solution for MDCM")
 plt.legend()

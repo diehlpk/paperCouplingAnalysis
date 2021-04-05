@@ -327,6 +327,7 @@ for i in range(4,8):
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
         plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
         plt.ylabel("Displacement")
+        np.savetxt("coupling-"+example.lower()+"-vhm.csv",uSlice)  
 
 plt.title("Example with "+example+" solution for VHCM")
 plt.legend()

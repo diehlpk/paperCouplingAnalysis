@@ -20,13 +20,11 @@ example = sys.argv[1]
 def exactSolution(x):
     
     if example == "Cubic":
-        return x * x * x
+        return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
-        return x * x * x * x
+        return 16/9 * x * x - 32/27 * x * x * x + 16/81 * x * x * x * x
     elif example == "Quadratic":
-        return x * x
-    elif example == "Linear":
-        return x
+        return  4/3 * x - 4/9 * x * x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -43,9 +41,11 @@ xFull = np.linspace(0,3.,nodesFull)
 
 
 
-uMDCM = np.loadtxt("coupling-"+example.lower()+"-approach-1.csv",)   
-uMSCM = np.loadtxt("coupling-"+example.lower()+"-approach-2.csv")    
-uVHCM = np.loadtxt("coupling-"+example.lower()+"-vhm.csv")    
+uMDCM = np.loadtxt("coupling-"+example.lower()+"-approach-1-direchlet.csv")    
+uMSCM = np.loadtxt("coupling-"+example.lower()+"-approach-2-direchlet.csv")    
+uVHCM = np.loadtxt("coupling-"+example.lower()+"-vhm-direchlet.csv")    
+
+    
 
 plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
 plt.plot(xFull,uMDCM,label=r"MDCM",c="black",marker=markers[0],markevery=5)
@@ -58,5 +58,5 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+"-all.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-all-direchlet.pdf",bbox_inches='tight')
 
