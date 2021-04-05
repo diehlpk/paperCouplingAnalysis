@@ -6,8 +6,10 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
+
 
 
 example = sys.argv[1]
@@ -294,18 +296,19 @@ for i in range(4,8):
 
         uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta=1/"+str(int(n/2))+"$)",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t FDM")
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-VHM ($\delta=1/"+str(int(n/2))+"$)",c="black",marker=markers[i-4],markevery=8)
+        plt.ylabel("Error in displacement w.r.t. FDM")
         
     
     elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=8)
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm-direchlet.csv",uSlice)     
 
-plt.title("Example with "+example+" solution for VHCM")
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.6f'))
+plt.title("Example with "+example.lower()+" solution for VHCM with $m=2$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

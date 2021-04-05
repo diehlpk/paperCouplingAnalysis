@@ -47,13 +47,13 @@ uVHCM = np.loadtxt("coupling-"+example.lower()+"-vhm-direchlet.csv")
 
     
 
-plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
-plt.plot(xFull,uMDCM,label=r"MDCM",c="black",marker=markers[0],markevery=5)
-plt.plot(xFull,uMSCM,label=r"MSCM",c="black",marker=markers[1],markevery=5)
-plt.plot(xFull,uVHCM,label=r"VHCM",c="black",marker=markers[2],markevery=5)
+plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+plt.plot(xFull,uMDCM,label=r"MDCM",c="black",marker=markers[0],markevery=4)
+plt.plot(xFull,uMSCM,label=r"MSCM",c="black",marker=markers[1],markevery=4)
+plt.plot(xFull,uVHCM,label=r"VHCM",c="black",marker=markers[2],markevery=4)
 plt.ylabel("Displacement")
        
-plt.title("Example with "+example+" solution")
+plt.title("Example with "+example.lower()+" solution with $\delta=1/8$ and $m=2$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
