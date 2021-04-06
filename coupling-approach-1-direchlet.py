@@ -220,6 +220,7 @@ def Coupling(n,h):
 
 
 markers = ['s','o','x','.']
+level = [8,16,32,64]
 
 for i in range(4,8):
     n = np.power(2,i)
@@ -253,13 +254,13 @@ for i in range(4,8):
 
     if example == "Quartic" :
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=8)
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=level[i-4])
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=8)
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=level[i-4])
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-1-direchlet.csv",uSlice)        
 

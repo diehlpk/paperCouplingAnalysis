@@ -585,6 +585,9 @@ markers = ['s','o','x','.']
 
 delta = 1 / float(factor)
 
+vmax = (10./81.)*delta*delta - ((4./243.) * delta * delta * delta * (8+3*delta))
+print("{:.7f}".format(vmax))
+
 # Case 1  
 h = delta / 2
 nodes = int(1 / h) + 1
@@ -595,7 +598,6 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodes,h)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
@@ -610,6 +612,7 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
 plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=8)
+print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 2
 h = delta / 4
@@ -621,7 +624,6 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodes,h)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
@@ -636,6 +638,7 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
 plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=16)
+print("h=",h,"m=4",abs((max(uSlice-uFD)-vmax)/vmax),"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 3
 h = delta / 8
@@ -647,7 +650,6 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodes,h)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 
@@ -663,10 +665,11 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
 plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=32)
+print("h=",h,"m=8",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.6f'))
-plt.title("Example with "+example.lower()+" solution for VHCM with $\delta=(1/$"+str(factor)+")")
+plt.title("Example with "+example.lower()+" solution for VHCM with $\delta=1/$"+str(factor))
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

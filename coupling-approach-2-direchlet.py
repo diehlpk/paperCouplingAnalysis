@@ -94,9 +94,6 @@ def FDM(n,h):
 
     
     M[n-1][n-1] = 1
-    #M[n-1][n-1] = 3*h
-    #M[n-1][n-2] = -4*h
-    #M[n-1][n-3] = h
 
     M *= 1./(2.*h*h)
 
@@ -155,8 +152,6 @@ def CouplingFDFD(n,h):
 
     M *= 1./(2.*h*h)
 
-    #np.savetxt("fd.csv", M, delimiter=",")
-    
     return M
 
 #############################################################################
@@ -170,9 +165,6 @@ def Coupling(n,h):
     fFD =  1./(2.*h*h)
     fPD =  1./(8.*h*h)
 
-    #fFD = 1
-    #D = 1
-    #h = 1
     # Boundary
 
     M[0][0] = 1
@@ -191,9 +183,6 @@ def Coupling(n,h):
     M[n-1][n+2] =  -1
 
     # 0.5
-    #M[n][n+1] = -1 / h
-    #M[n][n] = 1 / h
-
     M[n][n] = 11 / 6 / h
     M[n][n+1] = -18 / 6 / h
     M[n][n+2] = 9 / 6 / h
@@ -205,9 +194,6 @@ def Coupling(n,h):
     M[n][n-3] = 11 / 6 / h
 
     # 0.75
-    #M[n+1][n+1] = 1 / h
-    #M[n+1][n+2] = -1 / h
-
     M[n+1][n+1] = 11 / 6 / h
     M[n+1][n+2] = - 18 / 6 / h
     M[n+1][n+3] = 9 / 6 / h
@@ -219,9 +205,6 @@ def Coupling(n,h):
     M[n+1][n-5] = -2 / 6 / h
 
     # 1
-    #M[n+2][n+2] = 1 / h
-    #M[n+2][n+3] = -1 / h
-
     M[n+2][n+2] = 11 / 6 / h
     M[n+2][n+3] = -18 / 6 / h
     M[n+2][n+4] = 9 / 6 / h
@@ -248,9 +231,6 @@ def Coupling(n,h):
     M[2*n+1][2*n+4] = 1
 
     # 2.25
-    #M[2*n+2][2*n+1] = 1 / h
-    #M[2*n+2][2*n+2] = -1 / h
-
     M[2*n+2][2*n+2] = -11 / 6 / h
     M[2*n+2][2*n+1] = 18 / 6 / h
     M[2*n+2][2*n] = -9 / 6 / h
@@ -265,9 +245,6 @@ def Coupling(n,h):
 
     
     # 2.5
-    #M[2*n+3][2*n+3] = -1 / h
-    #M[2*n+3][2*n+2] = 1 / h
- 
     M[2*n+3][2*n+3] = -11 / 2 / h
     M[2*n+3][2*n+2] =  18 / 2 / h
     M[2*n+3][2*n+1] = -9 / 2 / h
@@ -279,9 +256,6 @@ def Coupling(n,h):
     M[2*n+3][2*n+9] = 2 / 6 / h
 
     # 2
-    #M[2*n+4][2*n+1] = -1 / h
-    #M[2*n+4][2*n] =  1 / h
-
     M[2*n+4][2*n+1] = -11 / 6 / h
     M[2*n+4][2*n] = 18 / 6 / h
     M[2*n+4][2*n-1] = -9 / 6 / h
@@ -303,14 +277,12 @@ def Coupling(n,h):
     # Boundary
 
     M[3*n+3][3*n+3] = 1
-    #M[3*n+3][3*n+3] = 3*h * fFD
-    #M[3*n+3][3*n+2] = -4*h * fFD
-    #M[3*n+3][3*n+1] = h * fFD
 
     return M
 
 
 markers = ['s','o','x','.']
+level = [8,16,32,64]
 
 for i in range(4,8):
     n = np.power(2,i)
@@ -346,7 +318,7 @@ for i in range(4,8):
 
     if example == "Quartic" :
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=8)
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=level[i-4])
     
         plt.ylabel("Error in displacement w.r.t. FDM")
 
@@ -354,7 +326,7 @@ for i in range(4,8):
 
 
         plt.plot(xFull,exactSolution(xFull),c="black",label="Exact solution")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=8)
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=level[i-4])
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-2-direchlet.csv",uSlice)    
 

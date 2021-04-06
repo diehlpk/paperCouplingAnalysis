@@ -340,13 +340,13 @@ for i in range(4,8):
         if i == 4 :
 
             plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
-            plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=4)
+            plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=n)
             plt.ylabel("Displacement")
             np.savetxt("coupling-"+example.lower()+"-approach-2.csv",uSlice)   
    
     else:
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=4)
+        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
         
 

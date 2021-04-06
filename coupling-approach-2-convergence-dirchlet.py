@@ -389,10 +389,8 @@ def Coupling4(n,h):
 
     M[2*n+4][2*n+4] = -1
     M[2*n+4][2*n+9] = 1
-
    
     #
-
     M[2*n+5][2*n+2] = 2 / 6 / h
     M[2*n+5][2*n+3] = -9 / 6 / h
     M[2*n+5][2*n+4] = 18 / 6 / h
@@ -404,7 +402,6 @@ def Coupling4(n,h):
     M[2*n+5][2*n+13] = 2 / 6 / h
 
     #
-
     M[2*n+6][2*n+3] = 2 / 6 / h
     M[2*n+6][2*n+4] = -9 / 6 / h
     M[2*n+6][2*n+5] = 18 / 6 / h
@@ -416,7 +413,6 @@ def Coupling4(n,h):
     M[2*n+6][2*n+14] = 2 / 6 / h
 
     #
-    
     M[2*n+7][2*n+4] = 2 / 6 / h
     M[2*n+7][2*n+5] = -9 / 6 / h
     M[2*n+7][2*n+6] = 18 / 6 / h
@@ -428,7 +424,6 @@ def Coupling4(n,h):
     M[2*n+7][2*n+15] = 2 / 6 / h
 
     #
-
     M[2*n+8][2*n+11] = 2 / 6 / h
     M[2*n+8][2*n+10] = -9 / 6 / h
     M[2*n+8][2*n+9] = 18 / 6 / h
@@ -487,7 +482,6 @@ def Coupling8(n,h):
     M[n][n-12] = -2 / 6 / h
 
     #
-
     M[n+1][n+4] = -2 / 6 / h
     M[n+1][n+3] = 9 / 6 / h
     M[n+1][n+2] = -18 / 6 / h
@@ -499,7 +493,6 @@ def Coupling8(n,h):
     M[n+1][n-11] = -2 / 6 / h
 
     #
-
     M[n+2][n+5] = -2 / 6 / h
     M[n+2][n+4] = 9 / 6 / h
     M[n+2][n+3] = -18 / 6 / h
@@ -511,7 +504,6 @@ def Coupling8(n,h):
     M[n+2][n-10] = -2 / 6 / h
 
     #
-
     M[n+3][n+6] = -2 / 6 / h
     M[n+3][n+5] = 9 / 6 / h
     M[n+3][n+4] = -18 / 6 / h
@@ -523,7 +515,6 @@ def Coupling8(n,h):
     M[n+3][n-9] = -2 / 6 / h
 
     #
-
     M[n+4][n+7] = -2 / 6 / h
     M[n+4][n+6] = 9 / 6 / h
     M[n+4][n+5] = -18 / 6 / h
@@ -535,7 +526,6 @@ def Coupling8(n,h):
     M[n+4][n-8] = -2 / 6 / h
 
     #
-
     M[n+5][n+8] = -2 / 6 / h
     M[n+5][n+7] = 9 / 6 / h
     M[n+5][n+6] = -18 / 6 / h
@@ -547,7 +537,6 @@ def Coupling8(n,h):
     M[n+5][n-7] = -2 / 6 / h
 
     #
-
     M[n+6][n+9] = -2 / 6 / h
     M[n+6][n+8] = 9 / 6 / h
     M[n+6][n+7] = -18 / 6 / h
@@ -560,7 +549,6 @@ def Coupling8(n,h):
 
 
     #
-
     M[n+7][n+10] = -2 / 6 / h
     M[n+7][n+9] = 9 / 6 / h
     M[n+7][n+8] = -18 / 6 / h
@@ -598,11 +586,6 @@ def Coupling8(n,h):
     M[2*n+8][2*n+17] = 1
 
     #
-
-
-    #M[2*n+9][2*n+9] = -1
-    #M[2*n+9][2*n+18] = 1
-    
     M[2*n+9][2*n+6] = 2 / 6 / h
     M[2*n+9][2*n+7] = -9 / 6 / h
     M[2*n+9][2*n+8] = 18 / 6 / h
@@ -614,10 +597,6 @@ def Coupling8(n,h):
     M[2*n+9][2*n+21] = 2 / 6 / h
 
     #
-
-    #M[2*n+10][2*n+10] = -1
-    #M[2*n+10][2*n+19] = 1
-
     M[2*n+10][2*n+7] = 2 / 6 / h
     M[2*n+10][2*n+8] = -9 / 6 / h
     M[2*n+10][2*n+9] =  18 / 6 / h
@@ -629,10 +608,6 @@ def Coupling8(n,h):
     M[2*n+10][2*n+22] = 2 / 6 / h
 
     #
-
-    #M[2*n+11][2*n+11] = -1
-    #M[2*n+11][2*n+20] = 1
-
     M[2*n+11][2*n+8] = 2 / 6 / h
     M[2*n+11][2*n+9] = -9 / 6 / h
     M[2*n+11][2*n+10] = 18 / 6 / h
@@ -644,11 +619,6 @@ def Coupling8(n,h):
     M[2*n+11][2*n+23] = 2 / 6 / h
 
     #
-
-    #M[2*n+12][2*n+12] = -1
-    #M[2*n+12][2*n+21] = 1
-
-
     M[2*n+12][2*n+9] = 2 / 6 / h
     M[2*n+12][2*n+10] = -9 / 6 / h
     M[2*n+12][2*n+11] = 18 / 6 / h
@@ -660,10 +630,6 @@ def Coupling8(n,h):
     M[2*n+12][2*n+24] = 2 / 6 / h
 
     #
-
-    #M[2*n+13][2*n+13] = -1
-    #[2*n+13][2*n+22] = 1
-
     M[2*n+13][2*n+10] = 2 / 6 / h
     M[2*n+13][2*n+11] =  -9 / 6 / h
     M[2*n+13][2*n+12] = 18 / 6 / h
@@ -675,10 +641,6 @@ def Coupling8(n,h):
     M[2*n+13][2*n+25] = 2 / 6 / h
 
     #
-
-    #M[2*n+14][2*n+14] = -1
-    #[2*n+14][2*n+23] = 1
-
     M[2*n+14][2*n+11] = 2 / 6 / h
     M[2*n+14][2*n+12] = -9 / 6 / h
     M[2*n+14][2*n+13] = 18 / 6 / h
@@ -690,11 +652,6 @@ def Coupling8(n,h):
     M[2*n+14][2*n+26] = 2 / 6 / h
 
     #
-
-    #M[2*n+15][2*n+15] = -1
-    #M[2*n+15][2*n+24] = 1
-
-
     M[2*n+15][2*n+12] =  2 / 6 / h
     M[2*n+15][2*n+13] = -9 / 6 / h
     M[2*n+15][2*n+14] = 18 / 6 / h
@@ -734,6 +691,9 @@ markers = ['s','o','x','.']
 
 delta = 1 / float(factor)
 
+vmax = (10./81.)*delta*delta
+print("{:.7f}".format(vmax))
+
 # Case 1  
 h = delta / 2
 nodes = int(1 / h) + 1
@@ -767,10 +727,9 @@ if case == "Exact" :
 
 else: 
 
-    
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    print(len(xFull),len(uFD))
     plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=8)
+    print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 2
 h = delta / 4
@@ -804,12 +763,13 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=8)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=16)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=8)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=16)
+    print("h=",h,"m=4",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 3
 h = delta / 8
@@ -849,18 +809,21 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=8)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=32)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=8)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=32)
+    print("h=",h,"m=8",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.6f'))
-plt.title("Example with "+example.lower()+" solution for MSCM $\delta=(1/$"+str(factor)+")")
+
+plt.title("Example with "+example.lower()+" solution for MSCM with $\delta=1/$"+str(factor))
 plt.legend()
 plt.grid()
+plt.xlabel("$x$")
 
 if case == "Exact" :
 

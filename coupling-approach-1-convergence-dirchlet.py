@@ -11,6 +11,7 @@ from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
+np.set_printoptions(suppress=True)
 
 example = sys.argv[1]
 case = sys.argv[2]
@@ -92,14 +93,7 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    #M[n-1][n-1] = 3*h
-    #M[n-1][n-2] = -4*h
-    #M[n-1][n-3] = h
-
     M[n-1][n-1] = 1
-    #M[n-1][n-2] = -18*h / 3
-    #M[n-1][n-3] = 9 * h / 3
-    #M[n-1][n-4] = -2 * h / 3
 
 
     M *= 1./(2.*h*h)
@@ -225,8 +219,6 @@ def Coupling(n,h):
 
     M[3*n+3][3*n+3] = 1
 
-    #np.savetxt("foo.csv", M, delimiter=",")
-
     return M
 
 def Coupling4(n,h):
@@ -281,9 +273,6 @@ def Coupling4(n,h):
         M[i][i+4] = -(1./64.)/ 2. / h / h *2
 
     # Overlap
-
-    #M[2*n+3][2*n+3] = -1
-    #M[2*n+3][2*n+8] = 1
 
     M[2*n+4][2*n+4] = -1
     M[2*n+4][2*n+9] = 1
@@ -430,12 +419,14 @@ markers = ['s','o','x','.']
 
 delta = float(1 / float(factor))
 
+vmax = (10./81.)*delta*delta
+print("{:.7f}".format(vmax))
+
 # Case 1  
 h = delta / 2
 nodes = int(1 / h) + 1
 nodesFull = 3 * nodes - 2 
 
-print(nodes,h)
 x1 = np.linspace(0,1,nodes)
 x2 = np.linspace(1-2*h,2+2*h,nodes+4)
 x3 = np.linspace(2,3.,nodes)
@@ -457,13 +448,12 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uF
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=8)
 
 else: 
-
-    
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=5)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=8)
+    print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 
 # Case 2
@@ -471,7 +461,6 @@ h = delta / 4
 nodes = int(1 / h) + 1
 nodesFull = 3 * nodes - 2
 
-print(nodes,h)
 x1 = np.linspace(0,1,nodes)
 x2 = np.linspace(1-4*h,2+4*h,nodes+8)
 x3 = np.linspace(2,3.,nodes)
@@ -499,19 +488,18 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=16)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=5)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=16)
+    print("h=",h,"m=4",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 3
 h = delta / 8
 nodes = int(1 / h) + 1
 nodesFull = 3 * nodes - 2
-
-print(nodes,h)
 
 x1 = np.linspace(0,1,nodes)
 x2 = np.linspace(1-8*h,2+8*h,nodes+16)
@@ -546,16 +534,17 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=8)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=32)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=8)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=32)
+    print("h=",h,"m=8",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.6f'))
-plt.title("Example with "+example.lower()+" solution for MDCM $\delta=(1/$"+str(factor)+")")
+plt.title("Example with "+example.lower()+" solution for MDCM with $\delta=1/$"+str(factor))
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
