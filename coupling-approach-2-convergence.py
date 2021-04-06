@@ -713,14 +713,14 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uF
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=8)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=16)
 
 else: 
 
     
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
     print(len(xFull),len(uFD))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=8)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=16)
 
 # Case 2
 h = delta / 4
@@ -754,12 +754,12 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=16)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=32)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=16)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=32)
 
 # Case 3
 h = delta / 8
@@ -799,12 +799,12 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=32)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=64)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=32)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=64)
 
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f')) 

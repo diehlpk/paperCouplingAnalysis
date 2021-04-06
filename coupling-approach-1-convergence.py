@@ -445,11 +445,6 @@ def Coupling8(n,h):
         M[i][i+1] = -2 * fFD
 
     # Boundary
-
-    #M[3*n+3][3*n+3] = 3*  h * fFD 
-    #M[3*n+3][3*n+2] = -4*h * fFD  
-    #M[3*n+3][3*n+1] = h * fFD 
-
     M[3*n+15][3*n+15] = 11 *  h * fFD / 3
     M[3*n+15][3*n+14] =  -18 * h * fFD  / 3
     M[3*n+15][3*n+13] = 9 * h * fFD / 3
@@ -532,12 +527,12 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=16)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=32)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=16)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=32)
 
 # Case 3
 h = delta / 8
@@ -579,15 +574,15 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=32)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=64)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=32)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=64)
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
-plt.title("Example with "+example.lower()+" solution for MDCM with $\delta=(1/$"+str(factor))
+plt.title("Example with "+example.lower()+" solution for MDCM with $\delta=1/$"+str(factor))
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
