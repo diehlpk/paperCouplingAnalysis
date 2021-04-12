@@ -46,6 +46,12 @@ def f(x):
     elif example == "Linear":
         g = 1
         return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x <= 1.5:
+            return 0 
+        else:
+            return 9-6*x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -86,6 +92,8 @@ def exactSolution(x):
         return x * x
     elif example == "Linear":
         return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -307,7 +315,7 @@ for i in range(4,8):
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
     
     
-    if example == "Quartic":
+    if example == "Quartic" or "Linear-cubic":
 
         if solution == "FDM" :
 
@@ -322,8 +330,6 @@ for i in range(4,8):
             plt.ylabel("Error in displacement w.r.t. exact solution")
 
 
-        
-    
     elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")

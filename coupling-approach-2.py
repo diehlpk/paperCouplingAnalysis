@@ -43,6 +43,12 @@ def f(x):
     elif example == "Linear":
         g = 1
         return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x <= 1.5:
+            return 0 
+        else:
+            return 9-6*x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -84,6 +90,8 @@ def exactSolution(x):
         return x * x
     elif example == "Linear":
         return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -331,7 +339,7 @@ for i in range(4,8):
 
 
     uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
-    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+    
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
@@ -345,6 +353,8 @@ for i in range(4,8):
             np.savetxt("coupling-"+example.lower()+"-approach-2.csv",uSlice)   
    
     else:
+
+        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
         plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
