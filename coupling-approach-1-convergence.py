@@ -46,6 +46,12 @@ def f(x):
     elif example == "Linear":
         g = 1
         return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x < 1.5:
+            return 0 
+        else:
+            return 9-6*x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -86,6 +92,8 @@ def exactSolution(x):
         return x * x
     elif example == "Linear":
         return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()

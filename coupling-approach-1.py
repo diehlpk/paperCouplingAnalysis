@@ -46,7 +46,7 @@ def f(x):
         return 0
     elif example == "Linear-cubic":
         g = 31./4.
-        if x <= 1.5:
+        if x < 1.5:
             return 0 
         else:
             return 9-6*x
