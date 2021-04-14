@@ -1,0 +1,745 @@
+#!/usr/bin/env python3
+# Coupling using a variable horizon (VHCM)
+# @author patrickdiehl@lsu.edu
+# @author serge.prudhomme@polymtl.ca
+# @date 02/05/2021
+import numpy as np
+import sys 
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.ticker import FormatStrFormatter
+
+pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
+
+
+example = sys.argv[1]
+factor = sys.argv[2]
+
+g = -1
+
+
+#############################################################################
+# Solve the system
+#############################################################################
+
+def solve(M,f):
+    return np.linalg.solve(M,f)
+
+#############################################################################
+# Loading
+#############################################################################
+
+def f(x):
+    
+    global g 
+
+    if example == "Cubic":
+        g = 27
+        return -6*x
+    elif example == "Quartic":
+        g = 108
+        return -12 * x*x
+    elif example == "Quadratic":
+        g = 6
+        return -2
+    elif example == "Linear":
+        g = 1
+        return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x < 1.5:
+            return 0 
+        else:
+            return 9-6*x
+    else:
+        print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
+        sys.exit()
+
+def forceFull(n,h):
+    
+    force = np.zeros(n)
+   
+    for i in range(1,n-1):
+        force[i] = f(i * h)
+    
+    force[n-1] = g
+    
+    return force
+
+def forceCoupling(n,x):
+    
+    force = np.zeros(n)
+   
+    for i in range(1,n-1):
+        force[i] = f(x[i])
+    
+    force[n-1] = g
+    
+    return force
+
+#############################################################################
+# Exact solution 
+#############################################################################
+
+def exactSolution(x):
+    
+    if example == "Cubic":
+        return x * x * x
+    elif example == "Quartic":
+        return x * x * x * x
+    elif example == "Quadratic":
+        return x * x
+    elif example == "Linear":
+        return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
+    else:
+        print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
+        sys.exit()
+
+#############################################################################
+# Assemble the stiffness matrix for the finite difference model (FD)
+#############################################################################
+
+def FDM(n,h):
+
+    M = np.zeros([n,n])
+
+    M[0][0] = 1
+
+    for i in range(1,n-1):
+        M[i][i-1] = -2
+        M[i][i] = 4
+        M[i][i+1] = -2
+
+    M[n-1][n-1] = 11*h / 3 
+    M[n-1][n-2] = -18*h / 3
+    M[n-1][n-3] = 9* h / 3
+    M[n-1][n-4] = -2* h / 3
+
+    M *= 1./(2.*h*h)
+
+    return M
+
+#############################################################################
+# Assemble the stiffness matrix for the coupling of FDM - FDM - FDM
+#############################################################################
+
+def CouplingFDFD(n,h):
+
+    M = np.zeros([3*n,3*n])
+
+    M[0][0] = 1
+
+    for i in range(1,n-1):
+        M[i][i-1] = -2
+        M[i][i] = 4
+        M[i][i+1] = -2
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1 
+
+    M[n][n-1] = 3*h
+    M[n][n-2] = -4*h
+    M[n][n-3] = 1*h
+
+    M[n][n] = 3*h
+    M[n][n+1] = -4*h
+    M[n][n+2] = 1*h
+
+    for i in range(n+1,2*n-1):
+        M[i][i-1] = -2
+        M[i][i] = 4
+        M[i][i+1] = -2
+
+    M[2*n-1][2*n-1] = -1 
+    M[2*n-1][2*n] = 1
+
+    M[2*n][2*n-1] = 3*h
+    M[2*n][2*n-2] = -4*h
+    M[2*n][2*n-3] = h
+
+    M[2*n][2*n] = 3*h
+    M[2*n][2*n+1] = -4*h
+    M[2*n][2*n+2] = h
+
+    for i in range(2*n+1,3*n-1):
+        M[i][i-1] = -2
+        M[i][i] = 4
+        M[i][i+1] = -2
+
+    M[3*n-1][3*n-1] = 3*h
+    M[3*n-1][3*n-2] = -4*h
+    M[3*n-1][3*n-3] = h
+
+    M *= 1./(2.*h*h)
+
+    return M
+
+#############################################################################
+# Assemble the stiffness matrix for the varibale horizon model (VHM)
+#############################################################################
+
+def VHM(n,h):
+        
+    MVHM = np.zeros([n,n])
+
+    MVHM[0][0] = 1.
+
+    MVHM[1][0] = -8.
+    MVHM[1][1] = 16.
+    MVHM[1][2] = -8.
+
+    for i in range(2,n-2):
+        MVHM[i][i-2] = -1.
+        MVHM[i][i-1] = -4.
+        MVHM[i][i] = 10.
+        MVHM[i][i+1] = -4.
+        MVHM[i][i+2] = -1.
+
+
+    MVHM[n-2][n-1] = -8.
+    MVHM[n-2][n-2] = 16.
+    MVHM[n-2][n-3] = -8.
+
+    MVHM[n-1][n-1] = 12.*h
+    MVHM[n-1][n-2] = -16.*h
+    MVHM[n-1][n-3] = 4.*h
+
+    MVHM *= 1./(8.*h*h)
+    
+    return  MVHM
+
+
+#############################################################################
+# Assemble the stiffness matrix for the coupling of FDM - VHM - FDM
+#############################################################################
+
+def CouplingFDVHM(nodes1,nodes2,nodes3,h):
+
+    total = nodes1 + nodes2 + nodes3
+
+    fVHM = 1./(8.*h*h)
+    fFDM = 1./(2.*h*h)
+
+    M = np.zeros([total,total])
+    
+    M[0][0] = 1 * fFDM
+
+    for i in range(1,nodes1-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[nodes1-1][nodes1-1] = -1 
+    M[nodes1-1][nodes1] = 1   
+
+    M[nodes1][nodes1-1] = 11*h * fFDM / 3
+    M[nodes1][nodes1-2] = -18*h * fFDM / 3
+    M[nodes1][nodes1-3] = 9*h * fFDM / 3
+    M[nodes1][nodes1-4] = -2*h * fFDM / 3
+
+    M[nodes1][nodes1] = 11 / 6 / h 
+    M[nodes1][nodes1+1] = -18 / 6 / h
+    M[nodes1][nodes1+2] = 9 / 6 / h
+    M[nodes1][nodes1+3] = -2 / 6 / h
+
+
+    M[nodes1+1][nodes1] = -8 * fVHM
+    M[nodes1+1][nodes1+1] = 16 * fVHM
+    M[nodes1+1][nodes1+2] = -8 * fVHM
+
+    for i in range(nodes1+2,nodes1+nodes2-2):
+        M[i][i-2] = -1. * fVHM
+        M[i][i-1] = -4. * fVHM
+        M[i][i] = 10. * fVHM
+        M[i][i+1] =  -4. * fVHM
+        M[i][i+2] = -1. * fVHM
+
+    n = nodes1 + nodes2
+
+    M[n-2][n-3] = -8 * fVHM
+    M[n-2][n-2] = 16 * fVHM
+    M[n-2][n-1] = -8 * fVHM
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 11 / 6 / h
+    M[n][n-2] = -18 / 6 / h
+    M[n][n-3] = 9 / 6 / h
+    M[n][n-4] = -2 / 6 / h
+
+    M[n][n] = 11*h * fFDM / 3
+    M[n][n+1] = -18*h * fFDM / 3
+    M[n][n+2] = 9*h * fFDM / 3
+    M[n][n+3] = -2*h * fFDM / 3
+
+
+    for i in range(n+1,n+nodes3-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    n += nodes3
+
+    M[n-1][n-1] = 11*h * fFDM / 3
+    M[n-1][n-2] = -18*h * fFDM / 3 
+    M[n-1][n-3] = 9 * h * fFDM / 3
+    M[n-1][n-4] = -2 * h * fFDM / 3
+    
+    return M
+
+def CouplingFDVHM4(nodes1,nodes2,nodes3,h):
+
+    total = nodes1 + nodes2 + nodes3
+
+    fVHM = 1./(8.*h*h)
+    fFDM = 1./(2.*h*h)
+
+    M = np.zeros([total,total])
+    
+    M[0][0] = 1 * fFDM
+
+    n = nodes1
+
+    for i in range(1,n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 11*h * fFDM / 3
+    M[n][n-2] = -18*h * fFDM / 3
+    M[n][n-3] = 9*h * fFDM / 3
+    M[n][n-4] = -2*h * fFDM / 3
+
+    M[n][n] = 11 / 6 / h 
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
+
+    # Node with one neighbor
+    M[n+1][n] = -8 * fVHM
+    M[n+1][n+1] = 16 * fVHM
+    M[n+1][n+2] = -8 * fVHM
+
+    # Node with two neighbor
+    M[n+2][n] = -1 * fVHM
+    M[n+2][n+1] = -4 * fVHM
+    M[n+2][n+2] = 10. * fVHM 
+    M[n+2][n+3] = -4 * fVHM
+    M[n+2][n+4] = -1 * fVHM
+
+    # Node with three neighbor
+    M[n+3][n] = -(1./27.)/ 2. / h / h  *2
+    M[n+3][n+1] = -(1./9.)/ 2. / h / h *2
+    M[n+3][n+2] = -(2./9.)/ 2. / h / h *2
+    M[n+3][n+3] = (20./27.)/ 2. / h / h *2
+    M[n+3][n+4] = -(2./9.)/ 2. / h / h *2
+    M[n+3][n+5] = -(1./9.)/ 2. / h / h *2
+    M[n+3][n+6] = -(1./27.)/ 2. / h / h *2   
+
+    for i in range(n+4,nodes1+nodes2-4):
+        M[i][i-4] = -(1./64.)/ 2. / h / h*2
+        M[i][i-3] = -(1./24.)/ 2. / h / h *2
+        M[i][i-2] = -(1./16.)/ 2. / h / h  *2
+        M[i][i-1] = -(1./8.)/ 2. / h / h *2
+        M[i][i] = (47./96.)/ 2. / h / h *2
+        M[i][i+1] = -(1./8.)/ 2. / h / h  *2
+        M[i][i+2] = -(1./16.)/ 2. / h / h *2
+        M[i][i+3] = -(1./24.)/ 2. / h / h *2
+        M[i][i+4] = -(1./64.)/ 2. / h / h*2
+
+    n = nodes1 + nodes2
+
+    # Node with three neighbors
+    M[n-4][n-7] = -(1./27.)/ 2. / h / h *2
+    M[n-4][n-6] = -(1./9.)/ 2. / h / h *2
+    M[n-4][n-5] = -(2./9.)/ 2. / h / h *2
+    M[n-4][n-4] = (20./27.)/ 2. / h / h *2
+    M[n-4][n-3] = -(2./9.)/ 2. / h / h *2
+    M[n-4][n-2] = -(1./9.)/ 2. / h / h *2
+    M[n-4][n-1] = -(1./27.)/ 2. / h / h *2
+
+    # Node with two neighbors
+    M[n-3][n-1] = -1 * fVHM
+    M[n-3][n-2] = -4 * fVHM
+    M[n-3][n-3] = 10. * fVHM 
+    M[n-3][n-4] = -4 * fVHM
+    M[n-3][n-5] = -1 * fVHM
+
+    # Node with one neighbor
+    M[n-2][n-3] = -8 * fVHM
+    M[n-2][n-2] = 16 * fVHM
+    M[n-2][n-1] = -8 * fVHM
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 11 / 6 / h
+    M[n][n-2] = -18 / 6 / h
+    M[n][n-3] = 9 / 6 / h
+    M[n][n-4] = -2 / 6 / h
+
+    M[n][n] = 11*h * fFDM / 3
+    M[n][n+1] = -18*h * fFDM / 3
+    M[n][n+2] = 9*h * fFDM / 3
+    M[n][n+3] = -2*h * fFDM / 3
+
+    for i in range(n+1,n+nodes3-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    n += nodes3
+
+    M[n-1][n-1] = 11*h * fFDM / 3
+    M[n-1][n-2] = -18*h * fFDM / 3
+    M[n-1][n-3] = 9* h * fFDM / 3
+    M[n-1][n-4] = -2* h * fFDM / 3
+    
+    return M
+
+def CouplingFDVHM8(nodes1,nodes2,nodes3,h):
+
+    total = nodes1 + nodes2 + nodes3
+
+    fVHM = 1./(8.*h*h)
+    fFDM = 1./(2.*h*h)
+
+    M = np.zeros([total,total])
+    
+    M[0][0] = 1 * fFDM
+
+    n = nodes1
+
+    for i in range(1,n-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 11*h * fFDM / 3
+    M[n][n-2] = -18*h * fFDM / 3
+    M[n][n-3] = 9*h * fFDM / 3
+    M[n][n-4] = -2*h * fFDM / 3
+
+    M[n][n] = 11 / 6 / h 
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
+
+    # Node with one neighbor
+    M[n+1][n] = -8 * fVHM
+    M[n+1][n+1] = 16 * fVHM
+    M[n+1][n+2] = -8 * fVHM
+
+    # Node with two neighbor
+    M[n+2][n] = -1 * fVHM
+    M[n+2][n+1] = -4 * fVHM
+    M[n+2][n+2] = 10. * fVHM 
+    M[n+2][n+3] = -4 * fVHM
+    M[n+2][n+4] = -1 * fVHM
+
+    # Node with three neighbor
+    M[n+3][n] = -(1./27.)/ 2. / h / h  *2
+    M[n+3][n+1] = -(1./9.)/ 2. / h / h *2
+    M[n+3][n+2] = -(2./9.)/ 2. / h / h *2
+    M[n+3][n+3] = (20./27.)/ 2. / h / h *2
+    M[n+3][n+4] = -(2./9.)/ 2. / h / h *2
+    M[n+3][n+5] = -(1./9.)/ 2. / h / h *2
+    M[n+3][n+6] = -(1./27.)/ 2. / h / h *2   
+
+    # Node with four neighbors
+    M[n+4][n] = -(1./64.)/ 2. / h / h *2
+    M[n+4][n+1] = -(1./24.)/ 2. / h / h *2
+    M[n+4][n+2] = -(1./16.)/ 2. / h / h *2
+    M[n+4][n+3] = -(1./8.)/ 2. / h / h *2
+    M[n+4][n+4] = (47./96.)/ 2. / h / h *2
+    M[n+4][n+5] = -(1./8.)/ 2. / h / h *2
+    M[n+4][n+6] = -(1./16.)/ 2. / h / h *2
+    M[n+4][n+7] = -(1./24.)/ 2. / h / h*2
+    M[n+4][n+8] = -(1./64.)/ 2. / h / h*2
+
+    # Node with 5 neighbors
+    M[n+5][n] = -(1/125) / 2. / h / h*2
+    M[n+5][n+1] = -(1/50) / 2. / h / h*2
+    M[n+5][n+2] = -(2/75) / 2. / h / h*2
+    M[n+5][n+3] = -(1/25) / 2. / h / h*2
+    M[n+5][n+4] = -(2/25) / 2. / h / h*2
+    M[n+5][n+5] =  (131/375) / 2. / h / h*2
+    M[n+5][n+6] =  -(2/25) / 2. / h / h*2
+    M[n+5][n+7] =  -(1/25) / 2. / h / h*2
+    M[n+5][n+8] = -(2/75) / 2. / h / h *2
+    M[n+5][n+9] = -(1/50) / 2. / h / h *2
+    M[n+5][n+10] = -(1/125) / 2. / h / h *2
+
+    # Node with 6 neighbors
+    M[n+6][n+6-6] =  -(1/216) / 2. / h / h *2
+    M[n+6][n+6-5] =  -(1/90) / 2. / h / h *2
+    M[n+6][n+6-4] =  -(1/72) / 2. / h / h *2
+    M[n+6][n+6-3] =  -(1/54) / 2. / h / h *2
+    M[n+6][n+6-2] =  -(1/36) / 2. / h / h *2
+    M[n+6][n+6-1] =  -(1/18) / 2. / h / h *2
+    M[n+6][n+6] =  (71/270) / 2. / h / h *2
+    M[n+6][n+6+1] =  -(1/18) / 2. / h / h *2
+    M[n+6][n+6+2] =  -(1/36) / 2. / h / h *2
+    M[n+6][n+6+3] =  -(1/54) / 2. / h / h *2
+    M[n+6][n+6+4] =  -(1/72) / 2. / h / h *2
+    M[n+6][n+6+5] =  -(1/90) / 2. / h / h *2
+    M[n+6][n+6+6] =  -(1/216) / 2. / h / h *2
+
+    # Node with 7 neighbors
+    M[n+7][n+7-7] = -(1/343)  / 2. / h / h*2
+    M[n+7][n+7-6] = -(1/147)  / 2. / h / h*2
+    M[n+7][n+7-5] = -(2/245)  / 2. / h / h*2
+    M[n+7][n+7-4] = -(1/98)  / 2. / h / h*2
+    M[n+7][n+7-3] =  -(2/147)  / 2. / h / h*2
+    M[n+7][n+7-2] =  -(1/49)  / 2. / h / h*2
+    M[n+7][n+7-1] = -(2/49)  / 2. / h / h*2
+    M[n+7][n+7] =  (353/1715)  / 2. / h / h*2
+    M[n+7][n+7+1] = -(2/49)  / 2. / h / h*2
+    M[n+7][n+7+2] =  -(1/49)  / 2. / h / h*2
+    M[n+7][n+7+3] =  -(2/147)  / 2. / h / h*2
+    M[n+7][n+7+4] = -(1/98)  / 2. / h / h*2
+    M[n+7][n+7+5] = -(2/245)  / 2. / h / h*2
+    M[n+7][n+7+6] = -(1/147)  / 2. / h / h*2
+    M[n+7][n+7+7] = -(1/343)  / 2. / h / h*2
+
+
+    for i in range(n+8,nodes1+nodes2-8):
+        M[i][i-8] = -(1/512) / 2. / h / h*2
+        M[i][i-7] = -(1/224) / 2. / h / h*2
+        M[i][i-6] = -(1/192) / 2. / h / h*2
+        M[i][i-5] = -(1/160) / 2. / h / h*2
+        M[i][i-4] = -(1/128) / 2. / h / h*2
+        M[i][i-3] = -(1/96) / 2. / h / h*2
+        M[i][i-2] = -(1/64) / 2. / h / h*2
+        M[i][i-1] = -(1/32) / 2. / h / h*2
+        M[i][i] =  (1487/8960) / 2. / h / h*2
+        M[i][i+1] = -(1/32) / 2. / h / h*2
+        M[i][i+2] = -(1/64) / 2. / h / h*2
+        M[i][i+3] = -(1/96) / 2. / h / h*2
+        M[i][i+4] = -(1/128) / 2. / h / h*2
+        M[i][i+5] = -(1/160) / 2. / h / h*2
+        M[i][i+6] = -(1/192) / 2. / h / h*2
+        M[i][i+7] = -(1/224) / 2. / h / h*2
+        M[i][i+8] = -(1/512) / 2. / h / h*2
+
+    n = nodes1+nodes2
+
+    # Node with 7 neighbors
+    M[n-8][n-15] = -(1/343)  / 2. / h / h *2
+    M[n-8][n-14] = -(1/147)  / 2. / h / h*2
+    M[n-8][n-13] = -(2/245)  / 2. / h / h*2
+    M[n-8][n-12] = -(1/98)  / 2. / h / h*2
+    M[n-8][n-11] =  -(2/147)  / 2. / h / h*2
+    M[n-8][n-10] =  -(1/49)  / 2. / h / h*2
+    M[n-8][n-9] =  -(2/49)  / 2. / h / h*2
+    M[n-8][n-8] = (353/1715)  / 2. / h / h*2
+    M[n-8][n-7] = -(2/49)  / 2. / h / h*2
+    M[n-8][n-6] =  -(1/49)  / 2. / h / h*2
+    M[n-8][n-5] = -(2/147)  / 2. / h / h*2
+    M[n-8][n-4] = -(1/98)  / 2. / h / h*2
+    M[n-8][n-3] = -(2/245)  / 2. / h / h*2
+    M[n-8][n-2] = -(1/147)  / 2. / h / h*2
+    M[n-8][n-1] = -(1/343)  / 2. / h / h*2
+    
+    # Node with 6 neighbors
+    M[n-7][n-13] =  -(1/216) / 2. / h / h *2
+    M[n-7][n-12] =  -(1/90) / 2. / h / h *2
+    M[n-7][n-11] =  -(1/72) / 2. / h / h *2
+    M[n-7][n-10] =  -(1/54) / 2. / h / h *2
+    M[n-7][n-9] =  -(1/36) / 2. / h / h *2
+    M[n-7][n-8] =  -(1/18) / 2. / h / h *2
+    M[n-7][n-7] = (71/270) / 2. / h / h *2
+    M[n-7][n-6] =   -(1/18) / 2. / h / h *2
+    M[n-7][n-5] =  -(1/36) / 2. / h / h *2
+    M[n-7][n-4] =  -(1/54) / 2. / h / h *2
+    M[n-7][n-3] =   -(1/72) / 2. / h / h *2
+    M[n-7][n-2] =  -(1/90) / 2. / h / h *2
+    M[n-7][n-1] =  -(1/216) / 2. / h / h *2
+    
+    # Node with 5 neighbors   
+    M[n-6][n-11] = -(1/125) / 2. / h / h *2
+    M[n-6][n-10] = -(1/50) / 2. / h / h*2
+    M[n-6][n-9] = -(2/75) / 2. / h / h*2
+    M[n-6][n-8] = -(1/25) / 2. / h / h*2
+    M[n-6][n-7] = -(2/25) / 2. / h / h*2
+    M[n-6][n-6] = (131/375) / 2. / h / h*2
+    M[n-6][n-5] = -(2/25) / 2. / h / h*2
+    M[n-6][n-4] = -(1/25) / 2. / h / h*2
+    M[n-6][n-3] = -(2/75) / 2. / h / h*2
+    M[n-6][n-2] =-(1/50) / 2. / h / h*2
+    M[n-6][n-1] = -(1/125) / 2. / h / h*2
+    
+    # Node with four neighbors
+    M[n-5][n-9] = -(1./64.)/ 2. / h / h *2
+    M[n-5][n-8] = -(1./24.)/ 2. / h / h*2
+    M[n-5][n-7] = -(1./16.)/ 2. / h / h*2
+    M[n-5][n-6] = -(1./8.)/ 2. / h / h*2
+    M[n-5][n-5] = (47./96.)/ 2. / h / h*2
+    M[n-5][n-4] = -(1./8.)/ 2. / h / h*2
+    M[n-5][n-3] = -(1./16.)/ 2. / h / h*2
+    M[n-5][n-2] = -(1./24.)/ 2. / h / h*2
+    M[n-5][n-1] = -(1./64.)/ 2. / h / h*2
+    
+    # Node with three neighbors
+    M[n-4][n-7] = -(1./27.)/ 2. / h / h *2
+    M[n-4][n-6] = -(1./9.)/ 2. / h / h *2
+    M[n-4][n-5] = -(2./9.)/ 2. / h / h *2
+    M[n-4][n-4] = (20./27.)/ 2. / h / h *2
+    M[n-4][n-3] = -(2./9.)/ 2. / h / h *2
+    M[n-4][n-2] = -(1./9.)/ 2. / h / h *2
+    M[n-4][n-1] = -(1./27.)/ 2. / h / h *2
+
+    # Node with two neighbors
+    M[n-3][n-5] = -1 * fVHM
+    M[n-3][n-4] = -4 * fVHM
+    M[n-3][n-3] = 10. * fVHM 
+    M[n-3][n-2] = -4 * fVHM
+    M[n-3][n-1] = -1 * fVHM
+
+    # Node with one neighbor
+    M[n-2][n-3] = -8 * fVHM
+    M[n-2][n-2] = 16 * fVHM
+    M[n-2][n-1] = -8 * fVHM
+ 
+    M[n-1][n-1] = -1 
+    M[n-1][n] = 1  
+
+    M[n][n-1] = 11 / 6 / h
+    M[n][n-2] = -18 / 6 / h
+    M[n][n-3] = 9 / 6 / h
+    M[n][n-4] = -2 / 6 / h
+
+    M[n][n] = 11*h * fFDM / 3
+    M[n][n+1] = -18*h * fFDM / 3
+    M[n][n+2] = 9*h * fFDM / 3
+    M[n][n+3] = -2*h * fFDM / 3
+
+    for i in range(n+1,n+nodes3-1):
+        M[i][i-1] = -2 * fFDM
+        M[i][i] = 4 * fFDM
+        M[i][i+1] = -2 * fFDM
+
+    n+= nodes3
+
+    M[n-1][n-1] = 11*h * fFDM / 3
+    M[n-1][n-2] = -18*h * fFDM / 3
+    M[n-1][n-3] = 9* h * fFDM / 3
+    M[n-1][n-4] = -2* h * fFDM / 3
+    
+    return M
+
+markers = ['s','o','x','.']
+
+
+delta = 1 / float(factor)
+vmax = 3./2. * delta * delta - 2 * delta * delta * delta
+print("{:.7f}".format(vmax))
+
+# Case 1  
+h = delta / 2
+nodes1 = int(0.75/h)+1
+nodes2 = int(1.25/h)+1
+nodes3 = int(1/h) + 1
+nodesFull = 3 * nodes3-2
+
+x1 = np.linspace(0,0.75,nodes1)
+x2 = np.linspace(0.75,2.,nodes2)
+x3 = np.linspace(2,3.,nodes3)
+x = np.array(np.concatenate((x1,x2,x3)))
+
+xFull = np.linspace(0,3.,nodesFull)
+forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x)
+
+forceCoupled[nodes1-1] = 0
+forceCoupled[nodes1] = 0
+
+forceCoupled[nodes1+nodes2-1] = 0
+forceCoupled[nodes1+nodes2] = 0
+
+uFDMVHM = solve(CouplingFDVHM(nodes1,nodes2,nodes3,h),forceCoupled)
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
+
+uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=16)
+print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
+
+# Case 2
+h = delta / 4
+nodes1 = int(0.75/h)+1
+nodes2 = int(1.25/h)+1
+nodes3 = int(1/h) + 1
+nodesFull = 3 * nodes3-2
+
+print(nodesFull,h)
+x1 = np.linspace(0,0.75,nodes1)
+x2 = np.linspace(0.75,2.,nodes2)
+x3 = np.linspace(2,3.,nodes3)
+x = np.array(np.concatenate((x1,x2,x3)))
+
+xFull = np.linspace(0,3.,nodesFull)
+forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x)
+
+forceCoupled[nodes1-1] = 0
+forceCoupled[nodes1] = 0
+
+forceCoupled[nodes1+nodes2-1] = 0
+forceCoupled[nodes1+nodes2] = 0
+
+uFDMVHM = solve(CouplingFDVHM4(nodes1,nodes2,nodes3,h),forceCoupled)
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
+
+uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=32)
+print("h=",h,"m=4",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
+
+# Case 3
+h = delta / 8
+nodes1 = int(0.75/h)+1
+nodes2 = int(1.25/h)+1
+nodes3 = int(1/h) + 1
+nodesFull = 3 * nodes3-2
+
+print(nodesFull,h)
+x1 = np.linspace(0,0.75,nodes1)
+x2 = np.linspace(0.75,2.,nodes2)
+x3 = np.linspace(2,3.,nodes3)
+x = np.array(np.concatenate((x1,x2,x3)))
+
+xFull = np.linspace(0,3.,nodesFull)
+forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x)
+
+forceCoupled[nodes1-1] = 0
+forceCoupled[nodes1] = 0
+
+forceCoupled[nodes1+nodes2-1] = 0
+forceCoupled[nodes1+nodes2] = 0
+
+uFDMVHM = solve(CouplingFDVHM8(nodes1,nodes2,nodes3,h),forceCoupled)
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
+
+uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=64)
+print("h=",h,"m=8",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
+
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
+plt.title("Example with "+example.lower()+" solution for VHCM with $\delta=1/$"+str(factor))
+plt.legend()
+plt.grid()
+plt.xlabel("$x$")
+plt.ylabel("Error in displacement w.r.t. FDM")
+
+plt.savefig("coupling-"+example.lower()+"-vhm-convergence-fdm-moving-"+factor+".pdf",bbox_inches='tight')
+
+
