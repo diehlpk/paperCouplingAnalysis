@@ -641,7 +641,7 @@ markers = ['s','o','x','.']
 
 
 delta = 1 / float(factor)
-vmax = 3./2. * delta * delta - 2 * delta * delta * delta
+vmax = 55./32. * delta * delta - 11./6. * delta * delta * delta 
 print("{:.7f}".format(vmax))
 
 # Case 1  

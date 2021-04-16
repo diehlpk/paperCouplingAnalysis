@@ -288,6 +288,8 @@ for i in range(4,8):
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+1:2*nodes],uFDMVHM[2*nodes+1:3*nodes])))
     uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
     
+    plt.axvline(x=1,c="#536872")
+    plt.axvline(x=2,c="#536872")
     
     if example == "Quartic" :
 

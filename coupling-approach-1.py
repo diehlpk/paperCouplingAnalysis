@@ -243,8 +243,6 @@ def Coupling(n,h):
     M[3*n+3][3*n+1] = 9 * h * fFD / 3
     M[3*n+3][3*n] = -2 * h * fFD / 3
 
-    np.savetxt("foo.csv", M, delimiter=",")
-
     return M
 
 
@@ -279,6 +277,9 @@ for i in range(4,8):
     uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
+
+    plt.axvline(x=1,c="#536872")
+    plt.axvline(x=2,c="#536872")
 
     if example == "Quartic" or "Linear-cubic":
 

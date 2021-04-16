@@ -39,13 +39,12 @@ nodesFull = 3 * n + 1
 
 xFull = np.linspace(0,3.,nodesFull)
 
-
-
 uMDCM = np.loadtxt("coupling-"+example.lower()+"-approach-1-direchlet.csv")    
 uMSCM = np.loadtxt("coupling-"+example.lower()+"-approach-2-direchlet.csv")    
 uVHCM = np.loadtxt("coupling-"+example.lower()+"-vhm-direchlet.csv")    
 
-    
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
 
 plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
 plt.plot(xFull,uMDCM,label=r"MDCM",c="black",marker=markers[0],markevery=4)

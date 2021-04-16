@@ -252,6 +252,9 @@ for i in range(4,8):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
+    plt.axvline(x=1,c="#536872")
+    plt.axvline(x=2,c="#536872")
+
     if example == "Quartic" :
 
         plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=level[i-4])

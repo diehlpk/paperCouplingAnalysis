@@ -291,9 +291,6 @@ def Coupling4(n,h):
     M[n+3][n+3] = -1
     M[n+3][n-2] = 1
 
-    #M[n+4][n+4] = -1
-    #M[n+4][n-1] = 1
-
     # PD
 
     for i in range(n+4,2*n+4):
@@ -309,9 +306,6 @@ def Coupling4(n,h):
         M[i][i+4] = -(1./64.)/ 2. / h / h *2
 
     # Overlap
-
-    #M[2*n+3][2*n+3] = -1
-    #M[2*n+3][2*n+8] = 1
 
     M[2*n+4][2*n+4] = -1
     M[2*n+4][2*n+9] = 1
@@ -336,10 +330,6 @@ def Coupling4(n,h):
         M[i][i+1] = -2 * fFD
 
     # Boundary
-
-    #M[3*n+3][3*n+3] = 3*  h * fFD 
-    #M[3*n+3][3*n+2] = -4*h * fFD  
-    #M[3*n+3][3*n+1] = h * fFD 
 
     M[3*n+7][3*n+7] = 11 *  h * fFD / 3
     M[3*n+7][3*n+6] =  -18 * h * fFD  / 3
@@ -492,6 +482,9 @@ forceCoupled[2*nodes+4] = 0
 
 uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
+
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
 
 if case == "Exact" :
 

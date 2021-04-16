@@ -643,6 +643,9 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
+
 plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=16)
 print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 

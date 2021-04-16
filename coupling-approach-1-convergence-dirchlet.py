@@ -422,6 +422,9 @@ delta = float(1 / float(factor))
 vmax = (10./81.)*delta*delta
 print("{:.7f}".format(vmax))
 
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
+
 # Case 1  
 h = delta / 2
 nodes = int(1 / h) + 1

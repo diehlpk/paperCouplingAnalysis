@@ -720,6 +720,9 @@ forceCoupled[2*nodes+4] = 0
 uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
+
 if case == "Exact" :
 
     plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=16)
