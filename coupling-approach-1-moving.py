@@ -264,8 +264,8 @@ for i in range(4,8):
     h = 1./n
     nodes1 = int(0.75/h)+1
     nodes2 = int(1.25/h)+1
-    nodes3 = n + 1
-    nodesFull = 3 * n + 1
+    nodes3 = int(1/h) + 1
+    nodesFull = 3 * nodes3-2
 
     print(nodesFull,h)
     x1 = np.linspace(0,0.75,nodes1)
