@@ -296,6 +296,9 @@ for i in range(4,8):
 
     uFDMVHM = solve(CouplingFDVHM(nodes1,nodes2,nodes3,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
+
+    plt.axvline(x=0.75,c="#536872")
+    plt.axvline(x=2,c="#536872")
     
     if example == "Quartic" :
 
