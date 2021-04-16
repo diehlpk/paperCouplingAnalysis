@@ -288,7 +288,7 @@ def Coupling(nodes1,nodes2,nodes3,h):
 markers = ['s','o','x','.']
 level = [8,16,32,64]
 
-plt.axvline(x=1,c="#536872")
+plt.axvline(x=0.75,c="#536872")
 plt.axvline(x=2,c="#536872")
 
 for i in range(4,8):
