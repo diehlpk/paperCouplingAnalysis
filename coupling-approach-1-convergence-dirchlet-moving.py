@@ -458,7 +458,7 @@ x3 = np.linspace(2,3.,nodes3)
 x = np.array(np.concatenate((x1,x2,x3)))
 
 xFull = np.linspace(0,3.,nodesFull)
-forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x,2)
+forceCoupled = forceCoupling(nodesFull,x,2)
 
 forceCoupled[nodes1-1] = 0
 forceCoupled[nodes1] = 0
@@ -497,7 +497,7 @@ x3 = np.linspace(2,3.,nodes3)
 x = np.array(np.concatenate((x1,x2,x3)))
 
 xFull = np.linspace(0,3.,nodesFull)
-forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x,4)
+forceCoupled = forceCoupling(nodesFull,x,4)
 
 forceCoupled[nodes1-1] = 0
 forceCoupled[nodes1] = 0
@@ -539,7 +539,7 @@ x3 = np.linspace(2,3.,nodes3)
 x = np.array(np.concatenate((x1,x2,x3)))
 
 xFull = np.linspace(0,3.,nodesFull)
-forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x,8)
+forceCoupled = forceCoupling(nodesFull,x,8)
 
 forceCoupled[nodes1-1] = 0
 forceCoupled[nodes1] = 0
