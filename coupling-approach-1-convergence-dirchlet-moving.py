@@ -441,7 +441,7 @@ delta = float(1 / float(factor))
 vmax = (10./81.)*delta*delta
 print("{:.7f}".format(vmax))
 
-plt.axvline(x=1,c="#536872")
+plt.axvline(x=0.75,c="#536872")
 plt.axvline(x=2,c="#536872")
 
 # Case 1  
@@ -458,7 +458,7 @@ x3 = np.linspace(2,3.,nodes3)
 x = np.array(np.concatenate((x1,x2,x3)))
 
 xFull = np.linspace(0,3.,nodesFull)
-forceCoupled = forceCoupling(nodesFull,x,2)
+forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x,2)
 
 forceCoupled[nodes1-1] = 0
 forceCoupled[nodes1] = 0
@@ -470,9 +470,6 @@ forceCoupled[nodes1+nodes2+4] = 0
 
 uFDMVHM = solve(Coupling(nodes1,nodes2,nodes3,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+3:nodes1+nodes2+2],uFDMVHM[nodes1+nodes2+5:len(x)])))
-
-plt.axvline(x=0.75,c="#536872")
-plt.axvline(x=2,c="#536872")
 
 if case == "Exact" :
 
@@ -497,7 +494,7 @@ x3 = np.linspace(2,3.,nodes3)
 x = np.array(np.concatenate((x1,x2,x3)))
 
 xFull = np.linspace(0,3.,nodesFull)
-forceCoupled = forceCoupling(nodesFull,x,4)
+forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x,4)
 
 forceCoupled[nodes1-1] = 0
 forceCoupled[nodes1] = 0
@@ -539,7 +536,7 @@ x3 = np.linspace(2,3.,nodes3)
 x = np.array(np.concatenate((x1,x2,x3)))
 
 xFull = np.linspace(0,3.,nodesFull)
-forceCoupled = forceCoupling(nodesFull,x,8)
+forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x,8)
 
 forceCoupled[nodes1-1] = 0
 forceCoupled[nodes1] = 0
