@@ -14,6 +14,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 factor = sys.argv[2]
+vmax_input = sys.argv[3]
 
 
 #############################################################################
@@ -606,7 +607,7 @@ markers = ['s','o','x','.']
 
 
 delta = 1 / float(factor)
-vmax = (10./81.)*delta*delta - ((4./243.) * delta * delta * delta * (8+3*delta))
+vmax = float(vmax_input)
 print("{:.7f}".format(vmax))
 
 plt.axvline(x=0.75,c="#536872")

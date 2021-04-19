@@ -16,6 +16,7 @@ np.set_printoptions(suppress=True)
 example = sys.argv[1]
 case = sys.argv[2]
 factor = sys.argv[3]
+vmax_input = sys.argv[4]
 
 #############################################################################
 # Solve the system
@@ -438,7 +439,7 @@ markers = ['s','o','x','.']
 
 delta = float(1 / float(factor))
 
-vmax = (10./81.)*delta*delta
+vmax = float(vmax_input)
 print("{:.7f}".format(vmax))
 
 plt.axvline(x=0.75,c="#536872")
