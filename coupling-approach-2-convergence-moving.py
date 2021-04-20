@@ -15,6 +15,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 example = sys.argv[1]
 case = sys.argv[2]
 factor = sys.argv[3]
+vmax_input = sys.argv[4]
 
 g = -1
 
@@ -712,7 +713,7 @@ def Coupling8(nodes1,nodes2,nodes3,h):
 markers = ['s','o','x','.']
 
 delta = 1 / float(factor)
-vmax = 3./2. * delta * delta 
+vmax =  float(vmax_input)
 print("{:.7f}".format(vmax))
 
 # Case 1  
