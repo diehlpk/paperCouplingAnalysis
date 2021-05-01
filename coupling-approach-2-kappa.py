@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# Coupling using the stress's first order approximation  (MSCM)
+# Coupling using the displacement for MDCM
 # @author patrickdiehl@lsu.edu
 # @author serge.prudhomme@polymtl.ca
-# @date 03/02/2021
+# @date 02/05/2021
 import numpy as np
 import sys 
 import matplotlib.pyplot as plt
@@ -15,6 +15,14 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 example = sys.argv[1]
 
 g = -1
+
+
+#############################################################################
+# Solve the system
+#############################################################################
+
+def solve(M,f):
+    return np.linalg.solve(M,f)
 
 #############################################################################
 # Solve the system
@@ -119,10 +127,10 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 11*h / 3 
+    M[n-1][n-1] = 11*h / 3
     M[n-1][n-2] = -18*h / 3
-    M[n-1][n-3] = 9* h / 3
-    M[n-1][n-4] = -2* h / 3
+    M[n-1][n-3] = 9 * h / 3
+    M[n-1][n-4] = -2 * h / 3
 
 
     M *= 1./(2.*h*h)
@@ -181,19 +189,18 @@ def CouplingFDFD(n,h):
     M[3*n-1][3*n-3] = h
 
     M *= 1./(2.*h*h)
- 
+    
     return M
 
 #############################################################################
 # Assemble the stiffness matrix for the coupling of FDM - Displacement - FDM 
 #############################################################################
 
-def Coupling(n,h):
+def Coupling(n,h,PDcoef):
 
     M = np.zeros([3*n+4,3*n+4])
 
     fFD =  1./(2.*h*h)
-    fPD =  1./(8.*h*h)
 
     M[0][0] = 1
 
@@ -247,11 +254,11 @@ def Coupling(n,h):
     # PD
 
     for i in range(n+3,2*n+1):
-        M[i][i-2] = -1.  * fPD
-        M[i][i-1] = -4. * fPD
-        M[i][i] = 10. * fPD
-        M[i][i+1] =  -4. * fPD
-        M[i][i+2] = -1. * fPD
+        M[i][i-2] = 1.  * PDcoef
+        M[i][i-1] = 4. * PDcoef
+        M[i][i] = -10. * PDcoef
+        M[i][i+1] =  4. * PDcoef
+        M[i][i+2] = 1. * PDcoef
 
     # Overlap
 
@@ -315,13 +322,26 @@ def Coupling(n,h):
 
 markers = ['s','o','x','.']
 
-for i in range(4,8):
-    n = np.power(2,i)
+for i in range(1,5):
+
+
+    n = np.power(2,4)
     h = 1./n
     nodes = n + 1
     nodesFull = 3 * n + 1
 
-    print(nodes,h)
+    delta = 2*h
+
+    print(delta)
+
+    #Compute kappa
+    E=1
+    xj=1.0+(i-1)*0.5
+    print(xj)
+    kappa=2*E/delta/delta/(1+delta*delta/(12*(xj)*xj))
+    PDcoef=-kappa*delta*delta/2/8/h/h
+
+    print(kappa,PDcoef)
     x1 = np.linspace(0,1,nodes)
     x2 = np.linspace(1-2*h,2+2*h,nodes+4)
     x3 = np.linspace(2,3.,nodes)
@@ -343,34 +363,69 @@ for i in range(4,8):
     forceCoupled[2*nodes+4] = 0
 
 
-    uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
+
+    uFDMVHM = solve(Coupling(nodes,h,PDcoef),forceCoupled)
+    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
     plt.axvline(x=1,c="#536872")
     plt.axvline(x=2,c="#536872")
 
-    if example == "Linear" or example == "Quadratic" or example == "Cubic":
+    if example == "Quartic" or "Linear-cubic":
 
-        if i == 4 :
-
-            plt.plot(xFull,exactSolution(xFull),label="Exact",c="black")
-            plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
-            plt.ylabel("Displacement")
-            np.savetxt("coupling-"+example.lower()+"-approach-2.csv",uSlice)   
-   
-    else:
-
-        uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-
-        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
+        plt.plot(xFull,uSlice-uFD,label=r"$\kappa$="+str(np.round(kappa,3))+"",c="black",marker=markers[i-1],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
-        
 
-plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))    
-plt.title("Example with "+example.lower()+" solution for MSCM with $m=2$")
+    elif i == 4:
+
+        plt.plot(xFull,uFD,label="FDM",c="black")
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-1],markevery=n)
+        plt.ylabel("Displacement")
+        np.savetxt("coupling-"+example.lower()+"-approach-2.csv",uSlice)   
+
+n = np.power(2,4)
+h = 1./n
+nodes = n + 1
+nodesFull = 3 * n + 1
+kappa = 128
+PDcoef=-kappa*delta*delta/2/8/h/h
+print(kappa,PDcoef)
+
+x1 = np.linspace(0,1,nodes)
+x2 = np.linspace(1-2*h,2+2*h,nodes+4)
+x3 = np.linspace(2,3.,nodes)
+x = np.array(np.concatenate((x1,x2,x3)))
+
+xFull = np.linspace(0,3.,nodesFull)
+
+  
+forceCoupled = forceCoupling(nodes,x)
+
+forceCoupled[nodes-1] = 0
+forceCoupled[nodes] = 0
+forceCoupled[nodes+1] = 0
+forceCoupled[nodes+2] = 0
+
+forceCoupled[2*nodes+1] = 0
+forceCoupled[2*nodes+2] = 0
+forceCoupled[2*nodes+3] = 0
+forceCoupled[2*nodes+4] = 0
+
+
+uFDMVHM = solve(Coupling(nodes,h,PDcoef),forceCoupled)
+uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
+
+uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
+
+plt.plot(xFull,uSlice-uFD,label=r"$\kappa$="+str(kappa)+"",c="black")
+
+
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f')) 
+plt.title("Influence of $\kappa$ for MSCM with $\delta=1/"+str(int(n/2))+"$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+"-approach-2-1.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-2-kappa.pdf",bbox_inches='tight')
 
