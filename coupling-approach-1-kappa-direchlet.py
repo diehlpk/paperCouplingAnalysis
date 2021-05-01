@@ -14,8 +14,6 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 
-g = -1
-
 
 #############################################################################
 # Solve the system
@@ -30,26 +28,12 @@ def solve(M,f):
 
 def f(x):
     
-    global g 
-
     if example == "Cubic":
-        g = 27
-        return -6*x
+        return -( 2/np.sqrt(3)) * ( -6 + 4*x )
     elif example == "Quartic":
-        g = 108
-        return -12 * x*x
+        return  -32/9 + 64/9 * x - 64/27 * x * x
     elif example == "Quadratic":
-        g = 6
-        return -2
-    elif example == "Linear":
-        g = 1
-        return 0
-    elif example == "Linear-cubic":
-        g = 31./4.
-        if x < 1.5:
-            return 0 
-        else:
-            return 9-6*x
+        return 8/9
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -61,7 +45,7 @@ def forceFull(n,h):
     for i in range(1,n-1):
         force[i] = f(i * h)
     
-    force[n-1] = g
+    force[n-1] = 0
     
     return force
 
@@ -72,7 +56,7 @@ def forceCoupling(n,x):
     for i in range(1,3*n+4):
         force[i] = f(x[i])
     
-    force[3*n+3] = g
+    force[3*n+3] = 0
     
     return force
 
@@ -83,15 +67,11 @@ def forceCoupling(n,x):
 def exactSolution(x):
     
     if example == "Cubic":
-        return x * x * x
+        return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
-        return x * x * x * x
+        return 16/9 * x * x - 32/27 * x * x * x + 16/81 * x * x * x * x
     elif example == "Quadratic":
-        return x * x
-    elif example == "Linear":
-        return x
-    elif example == "Linear-cubic":
-        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
+        return  4/3 * x - 4/9 * x * x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -111,11 +91,7 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 11*h / 3
-    M[n-1][n-2] = -18*h / 3
-    M[n-1][n-3] = 9 * h / 3
-    M[n-1][n-4] = -2 * h / 3
-
+    M[n-1][n-1] = 1
 
     M *= 1./(2.*h*h)
 
@@ -168,9 +144,7 @@ def CouplingFDFD(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[3*n-1][3*n-1] = 3*h
-    M[3*n-1][3*n-2] = -4*h
-    M[3*n-1][3*n-3] = h
+    M[3*n-1][3*n-1] = 1
 
     M *= 1./(2.*h*h)
     
@@ -236,10 +210,7 @@ def Coupling(n,h,PDcoef):
 
     # Boundary
  
-    M[3*n+3][3*n+3] = 11 *  h * fFD / 3
-    M[3*n+3][3*n+2] =  -18 * h * fFD  / 3
-    M[3*n+3][3*n+1] = 9 * h * fFD / 3
-    M[3*n+3][3*n] = -2 * h * fFD / 3
+    M[3*n+3][3*n+3] = 1
 
     return M
 
@@ -260,9 +231,9 @@ for i in range(1,5):
 
     #Compute kappa
     E=1
-    xj=1.0+(i-1)*0.5
+    xj=0.8+(i-1)*0.2
     print(xj)
-    kappa=2*E/delta/delta/(1+delta*delta/(12*(xj)*xj))
+    kappa=2*E/delta/delta/(1+16*delta*delta/3/(96-192*xj+64*xj*xj))
     PDcoef=-kappa*delta*delta/2/8/h/h
 
     print(kappa,PDcoef)
@@ -339,13 +310,11 @@ plt.plot(xFull,uSlice-uFD,label=r"$\kappa$="+str(kappa)+"",c="black")
 
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f')) 
-plt.title("Influence of $\kappa$ for MDCM with $\delta=1/"+str(int(n/2))+"$")
+plt.title("Influence of $\kappa$ for MDCM with $\delta=1/"+str(n)+"$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
 
-
-
-plt.savefig("coupling-"+example.lower()+"-approach-1-kappa.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-1-kappa-direchlet.pdf",bbox_inches='tight')
 
