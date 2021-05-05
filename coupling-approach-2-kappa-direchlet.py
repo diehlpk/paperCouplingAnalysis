@@ -159,6 +159,7 @@ def Coupling(n,h,PDcoef):
     M = np.zeros([3*n+4,3*n+4])
 
     fFD =  1./(2.*h*h)
+
     # Boundary
 
     M[0][0] = 1
@@ -172,18 +173,46 @@ def Coupling(n,h,PDcoef):
 
     # Overlapp
 
-    M[n-1][n-1] = -1 
-    M[n-1][n+2] = 1 
+    # 1
+    M[n-1][n-1] = 1
+    M[n-1][n+2] =  -1
 
-    M[n][n] = -1 
-    M[n][n-3] = 1 
+    # 0.5
+    M[n][n] = 11 / 6 / h
+    M[n][n+1] = -18 / 6 / h
+    M[n][n+2] = 9 / 6 / h
+    M[n][n+3] = -2 / 6 / h
 
-    M[n+1][n+1] = -1 
-    M[n+1][n-2] = 1 
+    M[n][n-6] =  -2 / 6 / h
+    M[n][n-5] =  9 / 6 / h
+    M[n][n-4] = -18  / 6 / h
+    M[n][n-3] = 11 / 6 / h
+
+    # 0.75
+    M[n+1][n+1] = 11 / 6 / h
+    M[n+1][n+2] = - 18 / 6 / h
+    M[n+1][n+3] = 9 / 6 / h
+    M[n+1][n+4] = -2 / 6 / h
+
+    M[n+1][n-2] = 11 / 6 / h
+    M[n+1][n-3] = -18 / 6 / h
+    M[n+1][n-4] = 9 / 6 / h
+    M[n+1][n-5] = -2 / 6 / h
+
+    # 1
+    M[n+2][n+2] = 11 / 6 / h
+    M[n+2][n+3] = -18 / 6 / h
+    M[n+2][n+4] = 9 / 6 / h
+    M[n+2][n+5] = -2 / 6 / h
+
+    M[n+2][n-1] = 11 / 6 / h
+    M[n+2][n-2] = -18 / 6 / h
+    M[n+2][n-3] = 9 / 6 / h
+    M[n+2][n-4] = -2 / 6 / h
 
     # PD
 
-    for i in range(n+2,2*n+2):
+    for i in range(n+3,2*n+1):
         M[i][i-2] = 1.  * PDcoef
         M[i][i-1] = 4. * PDcoef
         M[i][i] = -10. * PDcoef
@@ -192,14 +221,46 @@ def Coupling(n,h,PDcoef):
 
     # Overlap
 
-    M[2*n+2][2*n+2] = -1
-    M[2*n+2][2*n+5] = 1
+    # 2
+    M[2*n+1][2*n+1] = -1
+    M[2*n+1][2*n+4] = 1
 
-    M[2*n+3][2*n+3] = -1
-    M[2*n+3][2*n+6] = 1
+    # 2.25
+    M[2*n+2][2*n+2] = -11 / 6 / h
+    M[2*n+2][2*n+1] = 18 / 6 / h
+    M[2*n+2][2*n] = -9 / 6 / h
+    M[2*n+2][2*n-1] = 2 / 6 / h
 
-    M[2*n+4][2*n+4] = -1
-    M[2*n+4][2*n+1] = 1
+
+    M[2*n+2][2*n+8] =  2 / 6 / h 
+    M[2*n+2][2*n+7] =  -9 / 6 / h 
+    M[2*n+2][2*n+6] = 18  / 6 / h
+    M[2*n+2][2*n+5] = -11  / 6 / h
+
+
+    
+    # 2.5
+    M[2*n+3][2*n+3] = -11 / 2 / h
+    M[2*n+3][2*n+2] =  18 / 2 / h
+    M[2*n+3][2*n+1] = -9 / 2 / h
+    M[2*n+3][2*n+1] = -9 / 2 / h
+
+    M[2*n+3][2*n+6] = -11 / 6 / h
+    M[2*n+3][2*n+7] = 18 / 6 / h
+    M[2*n+3][2*n+8] = -9 / 6 / h
+    M[2*n+3][2*n+9] = 2 / 6 / h
+
+    # 2
+    M[2*n+4][2*n+1] = -11 / 6 / h
+    M[2*n+4][2*n] = 18 / 6 / h
+    M[2*n+4][2*n-1] = -9 / 6 / h
+    M[2*n+4][2*n-2] = 2 / 6 / h
+
+    M[2*n+4][2*n+4] = -11 / 6 / h
+    M[2*n+4][2*n+5] = 18  / 6 / h
+    M[2*n+4][2*n+6] = -9 / 6 / h
+    M[2*n+4][2*n+7] = 2 / 6 / h
+
 
     # FD
 
@@ -209,7 +270,7 @@ def Coupling(n,h,PDcoef):
         M[i][i+1] = -2 * fFD
 
     # Boundary
- 
+
     M[3*n+3][3*n+3] = 1
 
     return M
@@ -250,7 +311,9 @@ for i in range(1,5):
     forceCoupled[nodes-1] = 0
     forceCoupled[nodes] = 0
     forceCoupled[nodes+1] = 0
+    forceCoupled[nodes+2] = 0
 
+    forceCoupled[2*nodes+1] = 0
     forceCoupled[2*nodes+2] = 0
     forceCoupled[2*nodes+3] = 0
     forceCoupled[2*nodes+4] = 0
@@ -273,7 +336,7 @@ for i in range(1,5):
         plt.plot(xFull,uFD,label="FDM",c="black")
         plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-1],markevery=n)
         plt.ylabel("Displacement")
-        np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
+        np.savetxt("coupling-"+example.lower()+"-approach-2.csv",uSlice)   
 
 n = np.power(2,4)
 h = 1./n
@@ -296,7 +359,9 @@ forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
 forceCoupled[nodes] = 0
 forceCoupled[nodes+1] = 0
+forceCoupled[nodes+2] = 0
 
+forceCoupled[2*nodes+1] = 0
 forceCoupled[2*nodes+2] = 0
 forceCoupled[2*nodes+3] = 0
 forceCoupled[2*nodes+4] = 0
@@ -310,11 +375,11 @@ plt.plot(xFull,uSlice-uFD,label=r"$\kappa$="+str(kappa)+"",c="black")
 
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f')) 
-plt.title("Influence of $\kappa$ for MDCM with $\delta=1/"+str(int(n/2))+"$")
+plt.title("Influence of $\kappa$ for MSCM with $\delta=1/"+str(int(n/2))+"$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
 
-plt.savefig("coupling-"+example.lower()+"-approach-1-kappa-direchlet.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-2-kappa-direchlet.pdf",bbox_inches='tight')
 
