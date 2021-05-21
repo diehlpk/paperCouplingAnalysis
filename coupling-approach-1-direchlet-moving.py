@@ -231,7 +231,7 @@ def Coupling(nodes1,nodes2,nodes3,h):
 markers = ['s','o','x','.']
 level = [8,16,32,64]
 
-for i in range(4,8):
+for i in range(2,3):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
@@ -262,6 +262,8 @@ for i in range(4,8):
     uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+3:nodes1+nodes2+2],uFDMVHM[nodes1+nodes2+5:len(x)])))
+    print(uSlice)
+
 
     plt.axvline(x=0.75,c="#536872")
     plt.axvline(x=2,c="#536872")
