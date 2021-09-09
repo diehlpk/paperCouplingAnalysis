@@ -7,6 +7,7 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
@@ -44,6 +45,12 @@ def f(x):
     elif example == "Linear":
         g = 1
         return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x < 1.5:
+            return 0 
+        else:
+            return 9-6*x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -84,6 +91,8 @@ def exactSolution(x):
         return x * x
     elif example == "Linear":
         return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -608,6 +617,8 @@ markers = ['s','o','x','.']
 
 
 delta = 1 / float(factor)
+vmax = 3./2. * delta * delta - 2 * delta * delta * delta
+print("{:.7f}".format(vmax))
 
 # Case 1  
 h = delta / 2
@@ -619,7 +630,6 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
@@ -633,7 +643,11 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=5)
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
+
+plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=16)
+print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 2
 h = delta / 4
@@ -645,7 +659,6 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 forceCoupled[nodes-1] = 0
@@ -659,7 +672,8 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=5)
+plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=32)
+print("h=",h,"m=4",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 3
 h = delta / 8
@@ -671,7 +685,6 @@ x2 = np.linspace(1,2.,nodes)
 x3 = np.linspace(2,3.,nodes)
 x = np.array(np.concatenate((x1,x2,x3)))
 
-print(nodesFull)
 xFull = np.linspace(0,3.,nodesFull)
 forceCoupled = forceCoupling(nodes,x)
 
@@ -686,13 +699,15 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes:2*nodes-1],uF
 
 uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
+plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=64)
+print("h=",h,"m=8",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
-plt.title("Example with "+example+" solution for VHCM \n $\delta=(1/$"+str(factor)+")")
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
+plt.title("Example with "+example.lower()+" solution for VHCM with $\delta=1/$"+str(factor))
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
-plt.ylabel("Error in displacement w.r.t FDM")
+plt.ylabel("Error in displacement w.r.t. FDM")
 
 plt.savefig("coupling-"+example.lower()+"-vhm-convergence-fdm-"+factor+".pdf",bbox_inches='tight')
 

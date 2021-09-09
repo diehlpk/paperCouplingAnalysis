@@ -20,13 +20,11 @@ example = sys.argv[1]
 def exactSolution(x):
     
     if example == "Cubic":
-        return x * x * x
+        return (2/3/np.sqrt(3)) * ( 9*x - 9*x*x + 2 * x * x * x )
     elif example == "Quartic":
-        return x * x * x * x
+        return 16/9 * x * x - 32/27 * x * x * x + 16/81 * x * x * x * x
     elif example == "Quadratic":
-        return x * x
-    elif example == "Linear":
-        return x
+        return  4/3 * x - 4/9 * x * x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -41,20 +39,17 @@ nodesFull = 3 * n + 1
 
 xFull = np.linspace(0,3.,nodesFull)
 
-
-
-uMDCM = np.loadtxt("coupling-"+example.lower()+"-approach-1.csv",)   
-uMSCM = np.loadtxt("coupling-"+example.lower()+"-approach-2.csv")    
-uVHCM = np.loadtxt("coupling-"+example.lower()+"-vhm.csv")    
+uMDCM = np.loadtxt("coupling-"+example.lower()+"-approach-1-direchlet.csv")    
+uMSCM = np.loadtxt("coupling-"+example.lower()+"-approach-2-direchlet.csv")    
+uVHCM = np.loadtxt("coupling-"+example.lower()+"-vhm-direchlet.csv")    
 
 plt.axvline(x=1,c="#536872")
 plt.axvline(x=2,c="#536872")
 
 plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-plt.plot(xFull,uMDCM,label=r"MDCM",c="black",marker=markers[0],markevery=8)
-plt.plot(xFull,uMSCM,label=r"MSCM",c="black",marker=markers[1],markevery=8)
-plt.plot(xFull,uVHCM,label=r"VHCM",c="black",marker=markers[2],markevery=8)
-
+plt.plot(xFull,uMDCM,label=r"MDCM",c="black",marker=markers[0],markevery=4)
+plt.plot(xFull,uMSCM,label=r"MSCM",c="black",marker=markers[1],markevery=4)
+plt.plot(xFull,uVHCM,label=r"VHCM",c="black",marker=markers[2],markevery=4)
 plt.ylabel("Displacement")
        
 plt.title("Example with "+example.lower()+" solution with $\delta=1/8$ and $m=2$")
@@ -62,5 +57,5 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+"-all.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-all-direchlet.pdf",bbox_inches='tight')
 

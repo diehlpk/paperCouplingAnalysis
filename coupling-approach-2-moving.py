@@ -72,13 +72,12 @@ def forceFull(n,h):
 
 def forceCoupling(n,x):
     
-    force = np.zeros(3*n+4)
+    force = np.zeros(n+4)
    
-    for i in range(1,3*n+4):
+    for i in range(1,n+4):
         force[i] = f(x[i])
-    
 
-    force[3*n+3] = g
+    force[n+3] = g
     
     return force
 
@@ -188,9 +187,11 @@ def CouplingFDFD(n,h):
 # Assemble the stiffness matrix for the coupling of FDM - Displacement - FDM 
 #############################################################################
 
-def Coupling(n,h):
+def Coupling(nodes1,nodes2,nodes3,h):
 
-    M = np.zeros([3*n+4,3*n+4])
+    total = nodes1 + nodes2 + nodes3
+
+    M = np.zeros([total+4,total+4])
 
     fFD =  1./(2.*h*h)
     fPD =  1./(8.*h*h)
@@ -198,6 +199,7 @@ def Coupling(n,h):
     M[0][0] = 1
 
     # FD 
+    n = nodes1
 
     for i in range(1,n-1):
         M[i][i-1] = -2 * fFD
@@ -227,7 +229,6 @@ def Coupling(n,h):
     M[n+1][n+3] = 9 / 6 / h
     M[n+1][n+4] = -2 / 6 / h
 
-
     M[n+1][n-2] = 11 / 6 / h
     M[n+1][n-3] = -18 / 6 / h
     M[n+1][n-4] = 9 / 6 / h
@@ -246,7 +247,7 @@ def Coupling(n,h):
 
     # PD
 
-    for i in range(n+3,2*n+1):
+    for i in range(n+3,nodes1+nodes2+1):
         M[i][i-2] = -1.  * fPD
         M[i][i-1] = -4. * fPD
         M[i][i] = 10. * fPD
@@ -255,60 +256,61 @@ def Coupling(n,h):
 
     # Overlap
 
+    n += nodes2
+
     # 2
-    M[2*n+1][2*n+1] = -1
-    M[2*n+1][2*n+4] = 1
+    M[n+1][n+1] = -1
+    M[n+1][n+4] = 1
 
     # 2.25
-    M[2*n+2][2*n+2] = -11 / 6 / h
-    M[2*n+2][2*n+1] = 18 / 6 / h
-    M[2*n+2][2*n] = -9 / 6 / h
-    M[2*n+2][2*n-1] = 2 / 6 / h
+    M[n+2][n+2] = -11 / 6 / h
+    M[n+2][n+1] = 18 / 6 / h
+    M[n+2][n] = -9 / 6 / h
+    M[n+2][n-1] = 2 / 6 / h
 
-
-    M[2*n+2][2*n+8] =  2 / 6 / h 
-    M[2*n+2][2*n+7] =  -9 / 6 / h 
-    M[2*n+2][2*n+6] = 18  / 6 / h
-    M[2*n+2][2*n+5] = -11  / 6 / h
+    M[n+2][n+8] =  2 / 6 / h 
+    M[n+2][n+7] =  -9 / 6 / h 
+    M[n+2][n+6] = 18  / 6 / h
+    M[n+2][n+5] = -11  / 6 / h
 
     # 2.5
 
-    M[2*n+3][2*n+3] = -11 / 2 / h
-    M[2*n+3][2*n+2] =  18 / 2 / h
-    M[2*n+3][2*n+1] = -9 / 2 / h
-    M[2*n+3][2*n+1] = -9 / 2 / h
+    M[n+3][n+3] = -11 / 2 / h
+    M[n+3][n+2] =  18 / 2 / h
+    M[n+3][n+1] = -9 / 2 / h
+    M[n+3][n+1] = -9 / 2 / h
 
-    M[2*n+3][2*n+6] = -11 / 6 / h
-    M[2*n+3][2*n+7] = 18 / 6 / h
-    M[2*n+3][2*n+8] = -9 / 6 / h
-    M[2*n+3][2*n+9] = 2 / 6 / h
+    M[n+3][n+6] = -11 / 6 / h
+    M[n+3][n+7] = 18 / 6 / h
+    M[n+3][n+8] = -9 / 6 / h
+    M[n+3][n+9] = 2 / 6 / h
 
     # 2
 
-    M[2*n+4][2*n+1] = -11 / 6 / h
-    M[2*n+4][2*n] = 18 / 6 / h
-    M[2*n+4][2*n-1] = -9 / 6 / h
-    M[2*n+4][2*n-2] = 2 / 6 / h
+    M[n+4][n+1] = -11 / 6 / h
+    M[n+4][n] = 18 / 6 / h
+    M[n+4][n-1] = -9 / 6 / h
+    M[n+4][n-2] = 2 / 6 / h
 
-    M[2*n+4][2*n+4] = -11 / 6 / h
-    M[2*n+4][2*n+5] = 18  / 6 / h
-    M[2*n+4][2*n+6] = -9 / 6 / h
-    M[2*n+4][2*n+7] = 2 / 6 / h
-
+    M[n+4][n+4] = -11 / 6 / h
+    M[n+4][n+5] = 18  / 6 / h
+    M[n+4][n+6] = -9 / 6 / h
+    M[n+4][n+7] = 2 / 6 / h
 
     # FD
 
-    for i in range(2*n+5,3*n+3):
+    for i in range(n+5,n+nodes3+3):
         M[i][i-1] = -2 * fFD
         M[i][i] = 4 * fFD
         M[i][i+1] = -2 * fFD
 
     # Boundary
+    n += nodes3
 
-    M[3*n+3][3*n+3] = 11 / 6 / h
-    M[3*n+3][3*n+2] = -18 / 6 / h
-    M[3*n+3][3*n+1] = 9 / 6 / h
-    M[3*n+3][3*n]  = -2 / 6 / h
+    M[n+3][n+3] = 11 / 6 / h
+    M[n+3][n+2] = -18 / 6 / h
+    M[n+3][n+1] = 9 / 6 / h
+    M[n+3][n]  = -2 / 6 / h
 
     return M
 
@@ -318,35 +320,37 @@ markers = ['s','o','x','.']
 for i in range(4,8):
     n = np.power(2,i)
     h = 1./n
-    nodes = n + 1
-    nodesFull = 3 * n + 1
+    nodes1 = int(0.75/h)+1
+    nodes2 = int(1.25/h)+1
+    nodes3 = int(1/h) + 1
+    nodesFull = 3 * nodes3-2
 
-    print(nodes,h)
-    x1 = np.linspace(0,1,nodes)
-    x2 = np.linspace(1-2*h,2+2*h,nodes+4)
-    x3 = np.linspace(2,3.,nodes)
+    print(nodesFull,h)
+    x1 = np.linspace(0,0.75,nodes1)
+    x2 = np.linspace(0.75-2*h,2.+2*h,nodes2+4)
+    x3 = np.linspace(2,3.,nodes3)
     x = np.array(np.concatenate((x1,x2,x3)))
 
     xFull = np.linspace(0,3.,nodesFull)
 
   
-    forceCoupled = forceCoupling(nodes,x)
+    forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x)
 
-    forceCoupled[nodes-1] = 0
-    forceCoupled[nodes] = 0
-    forceCoupled[nodes+1] = 0
-    forceCoupled[nodes+2] = 0
+    forceCoupled[nodes1-1] = 0
+    forceCoupled[nodes1] = 0
+    forceCoupled[nodes1+1] = 0
+    forceCoupled[nodes1+2] = 0
 
-    forceCoupled[2*nodes+1] = 0
-    forceCoupled[2*nodes+2] = 0
-    forceCoupled[2*nodes+3] = 0
-    forceCoupled[2*nodes+4] = 0
+    forceCoupled[nodes1+nodes2+1] = 0
+    forceCoupled[nodes1+nodes2+2] = 0
+    forceCoupled[nodes1+nodes2+3] = 0
+    forceCoupled[nodes1+nodes2+4] = 0
 
 
-    uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
-    uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
+    uFDMVHM = solve(Coupling(nodes1,nodes2,nodes3,h),forceCoupled)
+    uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+3:nodes1+nodes2+2],uFDMVHM[nodes1+nodes2+5:len(x)])))
 
-    plt.axvline(x=1,c="#536872")
+    plt.axvline(x=0.75,c="#536872")
     plt.axvline(x=2,c="#536872")
 
     if example == "Linear" or example == "Quadratic" or example == "Cubic":
@@ -372,5 +376,5 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+"-approach-2-1.pdf",bbox_inches='tight')
+plt.savefig("coupling-"+example.lower()+"-approach-2-1-moving.pdf",bbox_inches='tight')
 

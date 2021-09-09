@@ -7,6 +7,7 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
@@ -43,6 +44,12 @@ def f(x):
     elif example == "Linear":
         g = 1
         return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x < 1.5:
+            return 0 
+        else:
+            return 9-6*x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -83,6 +90,8 @@ def exactSolution(x):
         return x * x
     elif example == "Linear":
         return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -101,10 +110,6 @@ def FDM(n,h):
         M[i][i-1] = -2
         M[i][i] = 4
         M[i][i+1] = -2
-
-    #M[n-1][n-1] = 3*h
-    #M[n-1][n-2] = -4*h
-    #M[n-1][n-3] = h
 
     M[n-1][n-1] = 11*h / 3
     M[n-1][n-2] = -18*h / 3
@@ -232,17 +237,11 @@ def Coupling(n,h):
         M[i][i+1] = -2 * fFD
 
     # Boundary
-
-    #M[3*n+3][3*n+3] = 3*  h * fFD 
-    #M[3*n+3][3*n+2] = -4*h * fFD  
-    #M[3*n+3][3*n+1] = h * fFD 
-
+ 
     M[3*n+3][3*n+3] = 11 *  h * fFD / 3
     M[3*n+3][3*n+2] =  -18 * h * fFD  / 3
     M[3*n+3][3*n+1] = 9 * h * fFD / 3
     M[3*n+3][3*n] = -2 * h * fFD / 3
-
-    #np.savetxt("foo.csv", M, delimiter=",")
 
     return M
 
@@ -279,18 +278,23 @@ for i in range(4,8):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
-    if example == "Quartic":
+    plt.axvline(x=1,c="#536872")
+    plt.axvline(x=2,c="#536872")
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t FDM")
+    if example == "Quartic" or "Linear-cubic":
+
+        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
+        plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
 
         plt.plot(xFull,uFD,label="FDM",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
         plt.ylabel("Displacement")
-    
-plt.title("Example with "+example+" solution for MDCM")
+        np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
+
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f')) 
+plt.title("Example with "+example.lower()+" solution for MDCM with $m=2$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

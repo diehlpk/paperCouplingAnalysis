@@ -7,6 +7,7 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
@@ -91,10 +92,6 @@ def FDM(n,h):
         M[i][i+1] = -2
 
     M[n-1][n-1] = 1
-
-    #M[n-1][n-1] = 3*h
-    #M[n-1][n-2] = -4*h
-    #M[n-1][n-3] = h
 
     M *= 1./(2.*h*h)
 
@@ -218,14 +215,12 @@ def Coupling(n,h):
     # Boundary
 
     M[3*n+3][3*n+3] = 1
-    #M[3*n+3][3*n+3] = 3*h * fFD
-    #M[3*n+3][3*n+2] = -4*h * fFD
-    #M[3*n+3][3*n+1] = h * fFD
-
+    
     return M
 
 
 markers = ['s','o','x','.']
+level = [8,16,32,64]
 
 for i in range(4,8):
     n = np.power(2,i)
@@ -257,18 +252,23 @@ for i in range(4,8):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
+    plt.axvline(x=1,c="#536872")
+    plt.axvline(x=2,c="#536872")
+
     if example == "Quartic" :
 
-        plt.plot(xFull,uSlice-uFD,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=5)
-        plt.ylabel("Error in displacement w.r.t FDM")
+        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=level[i-4])
+        plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=5)
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-3],markevery=level[i-4])
         plt.ylabel("Displacement")
-    
-plt.title("Example with "+example+" solution for MDCM")
+        np.savetxt("coupling-"+example.lower()+"-approach-1-direchlet.csv",uSlice)        
+
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.6f'))
+plt.title("Example with "+example.lower()+" solution for MDCM with $m=2$")
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")

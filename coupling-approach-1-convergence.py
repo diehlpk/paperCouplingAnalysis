@@ -7,6 +7,7 @@ import numpy as np
 import sys 
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.ticker import FormatStrFormatter
 
 pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
@@ -45,6 +46,12 @@ def f(x):
     elif example == "Linear":
         g = 1
         return 0
+    elif example == "Linear-cubic":
+        g = 31./4.
+        if x < 1.5:
+            return 0 
+        else:
+            return 9-6*x
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -85,6 +92,8 @@ def exactSolution(x):
         return x * x
     elif example == "Linear":
         return x
+    elif example == "Linear-cubic":
+        return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -282,9 +291,6 @@ def Coupling4(n,h):
     M[n+3][n+3] = -1
     M[n+3][n-2] = 1
 
-    #M[n+4][n+4] = -1
-    #M[n+4][n-1] = 1
-
     # PD
 
     for i in range(n+4,2*n+4):
@@ -300,9 +306,6 @@ def Coupling4(n,h):
         M[i][i+4] = -(1./64.)/ 2. / h / h *2
 
     # Overlap
-
-    #M[2*n+3][2*n+3] = -1
-    #M[2*n+3][2*n+8] = 1
 
     M[2*n+4][2*n+4] = -1
     M[2*n+4][2*n+9] = 1
@@ -327,10 +330,6 @@ def Coupling4(n,h):
         M[i][i+1] = -2 * fFD
 
     # Boundary
-
-    #M[3*n+3][3*n+3] = 3*  h * fFD 
-    #M[3*n+3][3*n+2] = -4*h * fFD  
-    #M[3*n+3][3*n+1] = h * fFD 
 
     M[3*n+7][3*n+7] = 11 *  h * fFD / 3
     M[3*n+7][3*n+6] =  -18 * h * fFD  / 3
@@ -444,11 +443,6 @@ def Coupling8(n,h):
         M[i][i+1] = -2 * fFD
 
     # Boundary
-
-    #M[3*n+3][3*n+3] = 3*  h * fFD 
-    #M[3*n+3][3*n+2] = -4*h * fFD  
-    #M[3*n+3][3*n+1] = h * fFD 
-
     M[3*n+15][3*n+15] = 11 *  h * fFD / 3
     M[3*n+15][3*n+14] =  -18 * h * fFD  / 3
     M[3*n+15][3*n+13] = 9 * h * fFD / 3
@@ -461,6 +455,8 @@ markers = ['s','o','x','.']
 
 
 delta = float(1 / float(factor))
+vmax = 3./2. * delta * delta 
+print("{:.7f}".format(vmax))
 
 # Case 1  
 h = delta / 2
@@ -487,15 +483,19 @@ forceCoupled[2*nodes+4] = 0
 uFDMVHM = solve(Coupling(nodes,h),forceCoupled)
 uSlice = np.array(np.concatenate((uFDMVHM[0:nodes],uFDMVHM[nodes+3:2*nodes+2],uFDMVHM[2*nodes+5:len(x)])))
 
+plt.axvline(x=1,c="#536872")
+plt.axvline(x=2,c="#536872")
+
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=2",marker=markers[0],markevery=16)
 
 else: 
 
     
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=5)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=2",marker=markers[0],markevery=16)
+    print("h=",h,"m=2",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 
 # Case 2
@@ -531,12 +531,13 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+4:2*nodes+4],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=4",marker=markers[1],markevery=32)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=5)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=4",marker=markers[1],markevery=32)
+    print("h=",h,"m=4",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
 # Case 3
 h = delta / 8
@@ -578,27 +579,28 @@ uSlice = np.array(np.concatenate((uFDMVHM[0:nodes-1],uFDMVHM[nodes+8:2*nodes+8],
 
 if case == "Exact" :
 
-    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=5)
+    plt.plot(xFull,uSlice-exactSolution(xFull),c="black",label="m=8",marker=markers[2],markevery=64)
 
 else :
 
     uFD =  solve(FDM(nodesFull,h),forceFull(nodesFull,h))
-    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=5)
+    plt.plot(xFull,uSlice-uFD,c="black",label="m=8",marker=markers[2],markevery=64)
+    print("h=",h,"m=8",(max(uSlice-uFD)-vmax)/vmax,"{:.7f}".format(max(uSlice-uFD)))
 
-
-plt.title("Example with "+example+" solution for MDCM \n $\delta=(1/$"+str(factor)+")")
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
+plt.title("Example with "+example.lower()+" solution for MDCM with $\delta=1/$"+str(factor))
 plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
 if case == "Exact" :
 
-    plt.ylabel("Error in displacement w.r.t exact solution")
+    plt.ylabel("Error in displacement w.r.t, exact solution")
     plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-exact-"+str(factor)+".pdf",bbox_inches='tight')
 
 else :
 
-    plt.ylabel("Error in displacement w.r.t FDM")
+    plt.ylabel("Error in displacement w.r.t, FDM")
     plt.savefig("coupling-"+example.lower()+"-approach-1-convergence-fdm-"+str(factor)+".pdf",bbox_inches='tight')
 
     
