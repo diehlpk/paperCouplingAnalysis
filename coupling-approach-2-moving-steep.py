@@ -13,7 +13,9 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 
 example = sys.argv[1]
-eps = float(sys.argv[2])
+eps = 0
+if example == "Steep":
+    eps = float(sys.argv[2])
 
 g = -1
 
@@ -59,6 +61,9 @@ def f(x):
     elif example == "steep":
         g = 1-np.exp((3/3-1)/eps)/(eps*(1-np.exp(-1/eps)))
         return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
+    elif example == "Sin":
+        g = 2 * np.pi * np.cos(2*np.pi*3)
+        return 4 * np.pi * np.pi * np.sin(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -105,6 +110,8 @@ def exactSolution(x):
         return 0
     elif example == "steep":
         return x - (np.exp(-(1-x/3)/eps) - np.exp(-1/eps))/(1-np.exp(-1/eps))*3
+    elif example == "Sin":
+        return np.sin(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -358,10 +365,11 @@ for i in range(8,12):
 
     uFDMVHM = solve(Coupling(nodes1,nodes2,nodes3,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+3:nodes1+nodes2+2],uFDMVHM[nodes1+nodes2+5:len(x)])))
+    uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-    if example == "Quartic" or example == "steep":
+    if example == "Quartic" or example == "steep" or example == "Sin":
 
-        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-8],markevery=n)
+        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-8],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
@@ -372,8 +380,8 @@ for i in range(8,12):
         np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
 
 
-plt.plot(xFull,exactSolution(xFull),label="u(x)",c="black")
-plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.1f'))  
+#plt.plot(xFull,exactSolution(xFull),label="u(x)",c="black")
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))  
 plt.title("Example with "+example.lower()+" solution for MSCM with $m=2$")
 plt.legend()
 plt.grid()

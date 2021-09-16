@@ -61,7 +61,6 @@ def f(x):
         return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
     elif example == "Sin":
         g = 2 * np.pi * np.cos(2*np.pi*3)
-        #print(g)
         return 4 * np.pi * np.pi * np.sin(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
