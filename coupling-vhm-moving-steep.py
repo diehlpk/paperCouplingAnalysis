@@ -15,7 +15,10 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 solution = sys.argv[2]
-eps = float(sys.argv[3])
+
+eps = 0
+if example == "Steep":
+    eps = float(sys.argv[3])
 
 g = -1 
 
@@ -56,6 +59,10 @@ def f(x):
     elif example == "Steep":
         g = 1-np.exp((3/3-1)/eps)/(eps*(1-np.exp(-1/eps)))
         return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
+    elif example == "Sin":
+        g = 2 * np.pi * np.cos(2*np.pi*3)
+        #print(g)
+        return 4 * np.pi * np.pi * np.sin(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -100,6 +107,8 @@ def exactSolution(x):
         return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     elif example == "Steep":
         return x - (np.exp(-(1-x/3)/eps) - np.exp(-1/eps))/(1-np.exp(-1/eps))*3
+    elif example == "Sin":
+        return np.sin(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -332,13 +341,13 @@ for i in range(8,12):
     plt.axvline(x=0.75,c="#536872")
     plt.axvline(x=2.5,c="#536872")
     
-    if example == "Quartic" or "Linear-cubic" or "Steep":
+    if example == "Quartic" or "Linear-cubic" or "Steep" or "Sin":
 
         if solution == "FDM" :
 
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-            plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
+            plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-8],markevery=n)
             plt.ylabel("Error in displacement w.r.t. FDM")
 
         elif solution == "Exact":
@@ -354,7 +363,7 @@ for i in range(8,12):
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm.csv",uSlice)  
 
-plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+#plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="blue")
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
 plt.title("Example with "+example.lower()+" solution for VHCM with $m=2$")
 plt.legend()
