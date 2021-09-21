@@ -13,7 +13,9 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 
 example = sys.argv[1]
-eps = float(sys.argv[2])
+eps = 0
+if example == "Steep":
+    eps = float(sys.argv[2])
 g = -1
 
 #############################################################################
@@ -51,7 +53,13 @@ def f(x):
             return 9-6*x
     elif example == "steep":
         g = 1-np.exp((3/3-1)/eps)/(eps*(1-np.exp(-1/eps)))
-        return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
+        return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))    
+    elif example == "Sin":
+        g = 2 * np.pi * np.cos(2*np.pi*3)
+        return 4 * np.pi * np.pi * np.sin(2*np.pi*x)
+    elif example == "Cos":
+        g = 2*np.pi*np.sin(2*np.pi*3)
+        return 4*np.pi*np.pi*np.cos(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -96,6 +104,10 @@ def exactSolution(x):
         return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
     elif example == "steep":
         return x - (np.exp(-(1-x/3)/eps) - np.exp(-1/eps))/(1-np.exp(-1/eps))*3
+    elif example == "Sin":
+        return np.sin(2*np.pi*x)
+    elif example == "Cos":
+        return np.cos(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -260,20 +272,21 @@ def Coupling(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-plt.axvline(x=0.75,c="#536872")
+plt.axvline(x=0.5,c="#536872")
 plt.axvline(x=2.5,c="#536872")
 
-for i in range(8,12):
+start = 5
+for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
-    nodes1 = int(0.75/h)+1
-    nodes2 = int(1.75/h)+1
+    nodes1 = int(0.5/h)+1
+    nodes2 = int(2/h)+1
     nodes3 = int(0.5/h) + 1
     nodesFull = 6 * nodes3-5
 
     print(nodesFull,h)
-    x1 = np.linspace(0,0.75,nodes1)
-    x2 = np.linspace(0.75-2*h,2.5+2*h,nodes2+4)
+    x1 = np.linspace(0,0.5,nodes1)
+    x2 = np.linspace(0.5-2*h,2.5+2*h,nodes2+4)
     x3 = np.linspace(2.5,3.,nodes3)
     x = np.array(np.concatenate((x1,x2,x3)))
 
@@ -294,25 +307,28 @@ for i in range(8,12):
 
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+3:nodes1+nodes2+2],uFDMVHM[nodes1+nodes2+5:len(x)])))
 
-    if example == "Quartic" or example == "steep":
+    if example == "Quartic" or example == "steep" or example == "Sin" or example == "Cos":
 
-        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-8],markevery=n)
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
 
         plt.plot(xFull,uFD,label="FDM",c="black")
-        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
 
 plt.plot(xFull,exactSolution(xFull),label="u(x)",c="black")
-plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.1f')) 
+plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.4f')) 
 plt.title("Example with "+example.lower()+" solution for MDCM with $m=2$")
 plt.legend(loc=2)
 plt.grid()
 plt.xlabel("$x$")
 
 
-plt.savefig("coupling-"+example.lower()+"-"+str(eps)+"-approach-1-moving.pdf",bbox_inches='tight')
+if example == "steep":
+    plt.savefig("coupling-"+example.lower()+"-"+str(eps)+"-"+str(start)+"-approach-1-moving.pdf",bbox_inches='tight')
+else:
+    plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-approach-1-moving.pdf",bbox_inches='tight') 
 

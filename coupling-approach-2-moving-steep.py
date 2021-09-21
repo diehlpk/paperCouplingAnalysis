@@ -330,20 +330,22 @@ def Coupling(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-plt.axvline(x=0.75,c="#536872")
+plt.axvline(x=0.5,c="#536872")
 plt.axvline(x=2.5,c="#536872")
 
-for i in range(8,12):
+
+start = 5
+for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
-    nodes1 = int(0.75/h)+1
-    nodes2 = int(1.75/h)+1
+    nodes1 = int(0.5/h)+1
+    nodes2 = int(2/h)+1
     nodes3 = int(0.5/h) + 1
     nodesFull = 6 * nodes3-5
 
     print(nodesFull,h)
-    x1 = np.linspace(0,0.75,nodes1)
-    x2 = np.linspace(0.75-2*h,2.5+2*h,nodes2+4)
+    x1 = np.linspace(0,0.5,nodes1)
+    x2 = np.linspace(0.5-2*h,2.5+2*h,nodes2+4)
     x3 = np.linspace(2.5,3.,nodes3)
     x = np.array(np.concatenate((x1,x2,x3)))
 
@@ -369,13 +371,13 @@ for i in range(8,12):
 
     if example == "Quartic" or example == "steep" or example == "Sin":
 
-        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-8],markevery=n)
+        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
 
         plt.plot(xFull,uFD,label="FDM",c="black")
-        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
 
@@ -387,5 +389,8 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-plt.savefig("coupling-"+example.lower()+"-"+str(eps)+"-approach-2-1-moving.pdf",bbox_inches='tight')
+if example == "steep":
+    plt.savefig("coupling-"+example.lower()+"-"+str(eps)+"-"+str(start)+"-approach-2-moving.pdf",bbox_inches='tight')
+else:
+    plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-approach-2-moving.pdf",bbox_inches='tight') 
 
