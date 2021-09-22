@@ -275,7 +275,7 @@ markers = ['s','o','x','.']
 plt.axvline(x=0.5,c="#536872")
 plt.axvline(x=2.5,c="#536872")
 
-start = 5
+start = 9
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
@@ -309,7 +309,7 @@ for i in range(start,start+4):
 
     if example == "Quartic" or example == "steep" or example == "Sin" or example == "Cos":
 
-        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:
@@ -319,7 +319,7 @@ for i in range(start,start+4):
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-1.csv",uSlice)   
 
-plt.plot(xFull,exactSolution(xFull),label="u(x)",c="black")
+#plt.plot(xFull,exactSolution(xFull),label="u(x)",c="black")
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.4f')) 
 plt.title("Example with "+example.lower()+" solution for MDCM with $m=2$")
 plt.legend(loc=2)

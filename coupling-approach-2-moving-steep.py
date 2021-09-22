@@ -334,7 +334,7 @@ plt.axvline(x=0.5,c="#536872")
 plt.axvline(x=2.5,c="#536872")
 
 
-start = 5
+start = 9
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
@@ -371,7 +371,7 @@ for i in range(start,start+4):
 
     if example == "Quartic" or example == "steep" or example == "Sin":
 
-        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+        plt.plot(xFull,uSlice-exactSolution(xFull),label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4:

@@ -10,7 +10,7 @@ import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 
 
-pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
+#pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\usepackage{xfrac}'] }
 
 
 example = sys.argv[1]
@@ -301,6 +301,7 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
     n += nodes3
 
+    
     M[n-1][n-1] = 11*h * fFDM / 3
     M[n-1][n-2] = -18*h * fFDM / 3 
     M[n-1][n-3] = 9 * h * fFDM / 3
@@ -310,22 +311,31 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-start = 5
+plt.axvline(x=0.75,c="#536872")
+plt.axvline(x=2.5,c="#536872")
+
+start = 9
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
-    nodes1 = int(0.5/h)+1
-    nodes2 = int(2/h)+1
+    nodes1 = int(0.75/h)+1
+    nodes2 = int(1.75/h)+1
     nodes3 = int(0.5/h) + 1
     nodesFull = 3 * n + 1
 
     print(nodesFull,h)
-    x1 = np.linspace(0,0.5,nodes1)
-    x2 = np.linspace(0.5,2.5,nodes2)
+    x1 = np.linspace(0,0.75,nodes1)
+    x2 = np.linspace(0.75,2.5,nodes2)
     x3 = np.linspace(2.5,3.,nodes3)
     x = np.array(np.concatenate((x1,x2,x3)))
 
+    #print(x)
+
+    #print(np.array(np.concatenate((x[0:nodes1],x[nodes1+1:nodes1+nodes2],x[nodes1+nodes2+1:nodes1+nodes2+nodes3]))))
+
     xFull = np.linspace(0,3.,nodesFull)
+
+    #print(xFull)
 
     forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x)
 
@@ -337,18 +347,33 @@ for i in range(start,start+4):
 
     uFDMVHM = solve(CouplingFDVHM(nodes1,nodes2,nodes3,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
+   
+    #print(uFDMVHM[nodes1-1])
+    #print(uFDMVHM[nodes1])
 
-    plt.axvline(x=0.5,c="#536872")
-    plt.axvline(x=2.5,c="#536872")
-    
+    #print(uFDMVHM[nodes1+nodes2-1])
+    #print(uFDMVHM[nodes1+nodes2])
+
     if example == "Quartic" or "Linear-cubic" or "Steep" or "Sin":
 
         if solution == "FDM" :
 
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-            plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+            plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+            #plt.plot(xFull,uFD,c='red')
             plt.ylabel("Error in displacement w.r.t. FDM")
+
+            print("Difference = ",uSlice[nodes1-1]-uFD[nodes1-1])
+            print("uFD",uFD[nodes1-1])
+            print("uCoupled = ",uSlice[nodes1-1])
+            #print("Exakt Solution = ",exactSolution(1))
+            print("------")
+
+            
+
+
+            
 
         elif solution == "Exact":
 
@@ -363,7 +388,7 @@ for i in range(start,start+4):
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm.csv",uSlice)  
 
-#plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="blue")
+plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="blue")
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
 plt.title("Example with "+example.lower()+" solution for VHCM with $m=2$")
 plt.legend()
