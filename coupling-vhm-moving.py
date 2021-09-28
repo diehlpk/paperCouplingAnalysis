@@ -52,6 +52,12 @@ def f(x):
             return 0 
         else:
             return 9-6*x
+    elif example == "Sin":
+        g = 2*np.pi*np.cos(2*np.pi*3)
+        return -4*np.pi*np.pi*np.sin(2*np.pi*x)
+    elif example == "Cos":
+        g = -2*np.pi*np.sin(2*np.pi*3)
+        return 4*np.pi*np.pi*np.cos(2*np.pi*x)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -70,7 +76,9 @@ def forceFull(n,h):
 def forceCoupling(n,x):
     
     force = np.zeros(n)
-   
+    
+    force[0] = 1
+
     for i in range(1,n-1):
         force[i] = f(x[i])
     
@@ -94,6 +102,10 @@ def exactSolution(x):
         return x
     elif example == "Linear-cubic":
         return np.where(x < 1.5, x, x + (x-1.5) * (x-1.5) * (x-1.5) )
+    elif example == "Sin":
+        return np.sin(2*np.pi*x)
+    elif example == "Cos":
+       return np.cos(2*np.pi*x) 
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -296,12 +308,13 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-for i in range(4,8):
+start = 8
+for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
     nodes2 = int(1.25/h)+1
-    nodes3 = n + 1
+    nodes3 = int(1/h)+1
     nodesFull = 3 * n + 1
 
     print(nodesFull,h)
@@ -326,18 +339,18 @@ for i in range(4,8):
     plt.axvline(x=0.75,c="#536872")
     plt.axvline(x=2,c="#536872")
     
-    if example == "Quartic" or "Linear-cubic":
+    if example == "Quartic" or "Linear-cubic" or example == "Sin" or example == "Cos":
 
         if solution == "FDM" :
 
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-            plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=n)
+            plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
             plt.ylabel("Error in displacement w.r.t. FDM")
 
         elif solution == "Exact":
 
-            plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=n)
+            plt.plot(xFull,uSlice-exactSolution(xFull),label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-start],markevery=n)
             plt.ylabel("Error in displacement w.r.t. exact solution")
 
 
@@ -348,6 +361,7 @@ for i in range(4,8):
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm.csv",uSlice)  
 
+plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
 plt.title("Example with "+example.lower()+" solution for VHCM with $m=2$")
 plt.legend()
@@ -355,6 +369,6 @@ plt.grid()
 plt.xlabel("$x$")
 
 if solution == "FDM" :
-    plt.savefig("coupling-"+example.lower()+"-vhm-moving.pdf",bbox_inches='tight')
+    plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-vhm-moving.pdf",bbox_inches='tight')
 else:
-    plt.savefig("coupling-"+example.lower()+"-vhm-exact-moving.pdf",bbox_inches='tight')
+    plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-vhm-exact-moving.pdf",bbox_inches='tight')
