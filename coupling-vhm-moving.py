@@ -54,7 +54,7 @@ def f(x):
             return 9-6*x
     elif example == "Sin":
         g = 2*np.pi*np.cos(2*np.pi*3)
-        return -4*np.pi*np.pi*np.sin(2*np.pi*x)
+        return 4*np.pi*np.pi*np.sin(2*np.pi*x)
     elif example == "Cos":
         g = -2*np.pi*np.sin(2*np.pi*3)
         return 4*np.pi*np.pi*np.cos(2*np.pi*x)
@@ -313,14 +313,14 @@ for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
-    nodes2 = int(1.25/h)+1
-    nodes3 = int(1/h)+1
+    nodes2 = int(1.75/h)+1
+    nodes3 = int(0.5/h)+1
     nodesFull = 3 * n + 1
 
     print(nodesFull,h)
     x1 = np.linspace(0,0.75,nodes1)
-    x2 = np.linspace(0.75,2.,nodes2)
-    x3 = np.linspace(2,3.,nodes3)
+    x2 = np.linspace(0.75,2.5,nodes2)
+    x3 = np.linspace(2.5,3.,nodes3)
     x = np.array(np.concatenate((x1,x2,x3)))
 
     xFull = np.linspace(0,3.,nodesFull)
@@ -337,7 +337,7 @@ for i in range(start,start+4):
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
 
     plt.axvline(x=0.75,c="#536872")
-    plt.axvline(x=2,c="#536872")
+    plt.axvline(x=2.5,c="#536872")
     
     if example == "Quartic" or "Linear-cubic" or example == "Sin" or example == "Cos":
 
@@ -345,7 +345,7 @@ for i in range(start,start+4):
 
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-            plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+            plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
             plt.ylabel("Error in displacement w.r.t. FDM")
 
         elif solution == "Exact":
@@ -361,7 +361,7 @@ for i in range(start,start+4):
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm.csv",uSlice)  
 
-plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
 plt.title("Example with "+example.lower()+" solution for VHCM with $m=2$")
 plt.legend()
