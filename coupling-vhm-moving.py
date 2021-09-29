@@ -56,8 +56,8 @@ def f(x):
         g = 2*np.pi*np.cos(2*np.pi*3)
         return 4*np.pi*np.pi*np.sin(2*np.pi*x)
     elif example == "Cos":
-        g = -2*np.pi*np.sin(2*np.pi*3)
-        return 4*np.pi*np.pi*np.cos(2*np.pi*x)
+        g = -2*np.pi*np.sin(2*np.pi*3+np.pi/2)
+        return 4*np.pi*np.pi*np.cos(2*np.pi*x+np.pi/2)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -103,7 +103,7 @@ def exactSolution(x):
     elif example == "Sin":
         return np.sin(2*np.pi*x)
     elif example == "Cos":
-       return np.cos(2*np.pi*x) 
+       return np.cos(2*np.pi*x+np.pi/2) 
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -306,7 +306,7 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-start = 4
+start = 8
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
@@ -343,7 +343,6 @@ for i in range(start,start+4):
 
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-            print(uSlice[0],uFD[0])
             plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
             plt.ylabel("Error in displacement w.r.t. FDM")
 
@@ -359,7 +358,6 @@ for i in range(start,start+4):
         plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=n)
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm.csv",uSlice)  
-
 
 plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%0.5f'))
 plt.title("Example with "+example.lower()+" solution for VHCM with $m=2$")
