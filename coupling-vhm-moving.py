@@ -77,8 +77,6 @@ def forceCoupling(n,x):
     
     force = np.zeros(n)
     
-    force[0] = 1
-
     for i in range(1,n-1):
         force[i] = f(x[i])
     
@@ -308,19 +306,19 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-start = 8
+start = 4
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
-    nodes1 = int(0.75/h)+1
-    nodes2 = int(1.75/h)+1
-    nodes3 = int(0.5/h)+1
+    nodes1 = int(0.5/h)+1
+    nodes2 = int(1.5/h)+1
+    nodes3 = int(1.0/h)+1
     nodesFull = 3 * n + 1
 
     print(nodesFull,h)
-    x1 = np.linspace(0,0.75,nodes1)
-    x2 = np.linspace(0.75,2.5,nodes2)
-    x3 = np.linspace(2.5,3.,nodes3)
+    x1 = np.linspace(0,0.5,nodes1)
+    x2 = np.linspace(0.5,2.,nodes2)
+    x3 = np.linspace(2.,3.,nodes3)
     x = np.array(np.concatenate((x1,x2,x3)))
 
     xFull = np.linspace(0,3.,nodesFull)
@@ -336,8 +334,8 @@ for i in range(start,start+4):
     uFDMVHM = solve(CouplingFDVHM(nodes1,nodes2,nodes3,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
 
-    plt.axvline(x=0.75,c="#536872")
-    plt.axvline(x=2.5,c="#536872")
+    plt.axvline(x=0.5,c="#536872")
+    plt.axvline(x=2.,c="#536872")
     
     if example == "Quartic" or "Linear-cubic" or example == "Sin" or example == "Cos":
 
@@ -345,6 +343,7 @@ for i in range(start,start+4):
 
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
+            print(uSlice[0],uFD[0])
             plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
             plt.ylabel("Error in displacement w.r.t. FDM")
 
