@@ -17,6 +17,7 @@ example = sys.argv[1]
 solution = sys.argv[2]
 
 g = -1 
+condition = True
 
 
 #############################################################################
@@ -301,12 +302,18 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
     M[n-1][n-2] = -18*h * fFDM / 3 
     M[n-1][n-3] = 9 * h * fFDM / 3
     M[n-1][n-4] = -2 * h * fFDM / 3
-    
+
+    if condition :
+        print(np.linalg.cond(M))
+        with open("con-vhm-neumann.txt", "a") as f:
+            f.write(str(np.linalg.cond(M))+"\n")
+            f.close()
+            
     return M
 
 markers = ['s','o','x','.']
 
-start = 4
+start = 8
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n

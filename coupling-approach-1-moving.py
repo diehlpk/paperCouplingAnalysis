@@ -13,6 +13,7 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 g = -1
+condition = True
 
 #############################################################################
 # Solve the system
@@ -259,6 +260,12 @@ def Coupling(nodes1,nodes2,nodes3,h):
     M[n+3][n+1] = 9 * h * fFD / 3
     M[n+3][n] = -2 * h * fFD / 3
 
+    if condition :
+        print(np.linalg.cond(M))
+        with open("con-approach-1-neumann.txt", "a") as f:
+            f.write(str(np.linalg.cond(M))+"\n")
+            f.close()
+
     return M
 
 
@@ -267,8 +274,8 @@ markers = ['s','o','x','.']
 plt.axvline(x=0.5,c="#536872")
 plt.axvline(x=2,c="#536872")
 
-start = 4
-for i in range(start,start+4):
+start = 8
+for i in range(start,start+3):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
