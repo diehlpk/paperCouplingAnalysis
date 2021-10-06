@@ -36,24 +36,13 @@ ax = plt.gca()
 ax.set_xticks(x)
 ax.set_xticklabels([r"$1/8$", r"$1/16$", r"$1/32$", r"$1/64$",
                      r"$1/128$",r"$1/256$",r"$1/512$"])
+ax.set_yscale('log')
 plt.plot(x,approach_1_con,label="MDCM",marker="o",color="black")
-plt.grid()
-plt.legend()
-plt.xlabel("delta")
-plt.ylabel("con(M)")
-plt.savefig("condition-neumann-MDCM.pdf",bbox_inches='tight')
-
-plt.clf()
-
-ax = plt.gca()
-ax.set_xticks(x)
-ax.set_xticklabels([r"$1/8$", r"$1/16$", r"$1/32$", r"$1/64$",
-                     r"$1/128$",r"$1/256$",r"$1/512$"])
 plt.plot(x,vhm_con,label="VHCM",marker="s",color="black")
 plt.plot(x,approach_2_con,label="MSCM",marker="x",color="black")
 plt.grid()
 plt.legend()
-plt.xlabel("delta")
-plt.ylabel("con(M)")
+plt.xlabel("$\delta$")
+plt.ylabel("cond(M)")
 plt.savefig("condition-neumann.pdf",bbox_inches='tight')
 
