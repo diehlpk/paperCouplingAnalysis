@@ -14,6 +14,8 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 
+condition = True
+
 
 #############################################################################
 # Solve the system
@@ -266,12 +268,19 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
     M[n-1][n-1] = 1
 
+    if condition :
+        print(np.linalg.cond(M))
+        with open("con-vhm-direchlet.txt", "a") as f:
+            f.write(str(np.linalg.cond(M))+"\n")
+            f.close()
+
     return M
 
 markers = ['s','o','x','.']
 level = [8,16,32,64]
 
-for i in range(4,8):
+start = 8
+for i in range(start,start+3):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
@@ -304,14 +313,14 @@ for i in range(4,8):
 
         uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-        plt.plot(xFull,uSlice-uFD,label=r"$\delta=1/"+str(int(n/2))+"$",c="black",marker=markers[i-4],markevery=level[i-4])
+        plt.plot(xFull,uSlice-uFD,label=r"$\delta=1/"+str(int(n/2))+"$",c="black",marker=markers[i-start],markevery=level[i-start])
         plt.ylabel("Error in displacement w.r.t. FDM")
         
     
     elif i == 4:
 
         plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
-        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-3],markevery=level[i-4])
+        plt.plot(xFull,uSlice,label=r"LLEM-VHM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-start],markevery=level[i-start])
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-vhm-direchlet.csv",uSlice)     
 

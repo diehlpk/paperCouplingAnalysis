@@ -15,6 +15,8 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 
+condition = True
+
 
 #############################################################################
 # Solve the system
@@ -282,6 +284,12 @@ def Coupling(nodes1,nodes2,nodes3,h):
 
     M[n+3][n+3] = 1
 
+    if condition :
+        print(np.linalg.cond(M))
+        with open("con-approach-2-dirchlet.txt", "a") as f:
+            f.write(str(np.linalg.cond(M))+"\n")
+            f.close()
+
     return M
 
 
@@ -291,7 +299,8 @@ level = [8,16,32,64]
 plt.axvline(x=0.75,c="#536872")
 plt.axvline(x=2,c="#536872")
 
-for i in range(4,8):
+start = 8
+for i in range(start,start+3):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
@@ -328,14 +337,14 @@ for i in range(4,8):
 
         uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
-        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-4],markevery=level[i-4])
+        plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=level[i-start])
     
         plt.ylabel("Error in displacement w.r.t. FDM")
 
     elif i == 4 :
 
         plt.plot(xFull,exactSolution(xFull),c="black",label="Exact solution")
-        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-4],markevery=level[i-4])
+        plt.plot(xFull,uSlice,label=r"LLEM-PDM ($\delta$=1/"+str(int(n/2))+")",c="black",marker=markers[i-start],markevery=level[i-start])
         plt.ylabel("Displacement")
         np.savetxt("coupling-"+example.lower()+"-approach-2-direchlet.csv",uSlice)    
 
