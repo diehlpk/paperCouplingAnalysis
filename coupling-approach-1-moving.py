@@ -13,7 +13,8 @@ pgf_with_latex = {"text.usetex": True, "font.size" : 12, "pgf.preamble" : [r'\us
 
 example = sys.argv[1]
 g = -1
-condition = True
+eps = 0.1
+condition = False
 
 #############################################################################
 # Solve the system
@@ -54,6 +55,9 @@ def f(x):
     elif example == "Cos":
         g = -2*np.pi*np.sin(2*np.pi*3+np.pi/2)
         return 4*np.pi*np.pi*np.cos(2*np.pi*x+np.pi/2)
+    elif example == "Steep" :
+        g = 1-np.exp((3/3-1)/eps)/(eps*(1-np.exp(-1/eps)))
+        return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -100,6 +104,8 @@ def exactSolution(x):
         return np.sin(2*np.pi*x)
     elif example == "Cos":
        return np.cos(2*np.pi*x+np.pi/2) 
+    elif example == "Steep":
+        return x-3*(np.exp((x/3-1)/eps)-np.exp(-1/eps))/(1-np.exp(-1/eps))
         
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
@@ -274,8 +280,8 @@ markers = ['s','o','x','.']
 plt.axvline(x=0.5,c="#536872")
 plt.axvline(x=2,c="#536872")
 
-start = 8
-for i in range(start,start+3):
+start = 4
+for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
     nodes1 = int(0.75/h)+1
@@ -311,6 +317,11 @@ for i in range(start,start+3):
         plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
         plt.ylabel("Error in displacement w.r.t. FDM")
 
+    if example == "Steep":
+        plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+        if i == start+3:
+            plt.plot(xFull,exactSolution(xFull),label="Exact solution",c="black")
+
     elif i == 4:
 
         plt.plot(xFull,uFD,label="FDM",c="black")
@@ -324,6 +335,8 @@ plt.legend()
 plt.grid()
 plt.xlabel("$x$")
 
-
-plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-approach-1-moving.pdf",bbox_inches='tight')
+if example == "Steep":
+    plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-"+str(eps)+"-approach-1-moving.pdf",bbox_inches='tight')
+else:
+    plt.savefig("coupling-"+example.lower()+"-"+str(start)+"-approach-1-moving.pdf",bbox_inches='tight')
 
