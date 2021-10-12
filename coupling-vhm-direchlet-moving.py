@@ -98,6 +98,12 @@ def FDM(n,h):
 
     M *= 1./(2.*h*h)
 
+    if condition :
+        print(np.linalg.cond(M))
+        with open("con-fdm-direchlet.txt", "a") as f:
+            f.write(str(np.linalg.cond(M))+"\n")
+            f.close()
+
     return M
 
 #############################################################################
