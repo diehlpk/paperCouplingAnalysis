@@ -66,6 +66,9 @@ def f(x):
     elif example == "Steep" :
         g = 1-np.exp((3/3-1)/eps)/(eps*(1-np.exp(-1/eps)))
         return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
+    elif example == "Tan":
+        g = (np.pi * np.power(np.sin(np.pi * 3 /8),2)) / ( 8 * np.power(np.cos( np.pi * 3 / 8),2)) + np.pi / 8
+        return -((np.pi * np.pi * np.power(np.sin(np.pi * x / 8),3)) / (32 * np.power(np.cos( np.pi * x / 8),3)) + (np.pi * np.pi * np.power(np.sin(np.pi * x / 8),1)) / (32 * np.cos( np.pi * x /8)))
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -116,6 +119,8 @@ def exactSolution(x):
        return np.cos(2*np.pi*x+np.pi/2) 
     elif example == "Steep":
         return x-3*(np.exp((x/3-1)/eps)-np.exp(-1/eps))/(1-np.exp(-1/eps))
+    elif example == "Tan":
+        return np.tan(3*x/4*np.pi/6)
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -340,7 +345,7 @@ def Coupling(nodes1,nodes2,nodes3,h):
 
 markers = ['s','o','x','.']
 
-start = 4
+start = 8
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
@@ -385,6 +390,8 @@ for i in range(start,start+4):
             plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
             plt.ylabel("Displacement")
             np.savetxt("coupling-"+example.lower()+"-approach-2.csv",uSlice)   
+
+
 
     elif example == "Steep":
         plt.plot(xFull,uSlice,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
