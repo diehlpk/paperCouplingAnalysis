@@ -64,8 +64,8 @@ def f(x):
         g = 1-np.exp((3/3-1)/eps)/(eps*(1-np.exp(-1/eps)))
         return np.exp((x/3-1)/eps)/(3*eps*eps*(1-np.exp(-1/eps)))
     elif example == "Tan":
-        g = (np.pi * np.power(np.sin(np.pi * 3 /8),2)) / ( 8 * np.power(np.cos( np.pi * 3 / 8),2)) + np.pi / 8
-        return -((np.pi * np.pi * np.power(np.sin(np.pi * x / 8),3)) / (32 * np.power(np.cos( np.pi * x / 8),3)) + (np.pi * np.pi * np.power(np.sin(np.pi * x / 8),1)) / (32 * np.cos( np.pi * x /8)))
+        g = (np.pi * np.power(np.sin(np.pi * 3. /8.),2)) / ( 8. * np.power(np.cos( np.pi * 3. / 8.),2)) + np.pi / 8.
+        return -((np.pi * np.pi * np.power(np.sin(np.pi * x / 8.),3)) / (32. * np.power(np.cos( np.pi * x / 8.),3)) + (np.pi * np.pi * np.power(np.sin(np.pi * x / 8.),1)) / (32. * np.cos( np.pi * x /8.)))
     else:
         print("Error: Either provide Linear, Quadratic, Quartic, or Cubic")
         sys.exit()
@@ -77,7 +77,7 @@ def forceFull(n,h):
     for i in range(1,n-1):
         force[i] = f(i * h)
     
-    force[n-1] = 0 #g
+    force[n-1] = g
     
     return force
 
@@ -88,7 +88,7 @@ def forceCoupling(n,x):
     for i in range(1,n-1):
         force[i] = f(x[i])
     
-    force[n-1] = 0 #g
+    force[n-1] = g
     
     return force
 
@@ -135,11 +135,11 @@ def FDM(n,h):
         M[i][i] = 4
         M[i][i+1] = -2
 
-    M[n-1][n-1] = 1
-    #M[n-1][n-1] = 11*h / 3 
-    #M[n-1][n-2] = -18*h / 3
-    #M[n-1][n-3] = 9* h / 3
-    #M[n-1][n-4] = -2* h / 3
+    #M[n-1][n-1] = 1
+    M[n-1][n-1] = 11*h / 3 
+    M[n-1][n-2] = -18*h / 3
+    M[n-1][n-3] = 9* h / 3
+    M[n-1][n-4] = -2* h / 3
 
 
     M *= 1./(2.*h*h)
@@ -310,11 +310,11 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
 
     n += nodes3
     
-    M[n-1][n-1] = 1 
-    #M[n-1][n-1] = 11*h * fFDM / 3
-    #M[n-1][n-2] = -18*h * fFDM / 3 
-    #M[n-1][n-3] = 9 * h * fFDM / 3
-    #M[n-1][n-4] = -2 * h * fFDM / 3
+    #M[n-1][n-1] = 1 
+    M[n-1][n-1] = 11*h * fFDM / 3
+    M[n-1][n-2] = -18*h * fFDM / 3 
+    M[n-1][n-3] = 9 * h * fFDM / 3
+    M[n-1][n-4] = -2 * h * fFDM / 3
 
     if condition :
         print(np.linalg.cond(M))
@@ -322,27 +322,37 @@ def CouplingFDVHM(nodes1,nodes2,nodes3,h):
             f.write(str(np.linalg.cond(M))+"\n")
             f.close()
             
+    np.savetxt("vhm-matrix.csv", M, delimiter=",")
+
     return M
 
 markers = ['s','o','x','.']
+
+plt.axvline(x=0.5,c="#536872")
+plt.axvline(x=1.5,c="#536872")
 
 start = 4
 for i in range(start,start+4):
     n = np.power(2,i)
     h = 1./n
+    print(h)
     nodes1 = int(0.5/h)+1
-    nodes2 = int(1.75/h)+1
-    nodes3 = int(0.75/h)+1
+    nodes2 = int(1./h)+1
+    nodes3 = int(1.5/h)+1
     nodesFull = 3 * n + 1
 
     print(nodesFull,h)
     x1 = np.linspace(0,0.5,nodes1)
-    x2 = np.linspace(0.5,2.25,nodes2)
-    x3 = np.linspace(2.25,3.,nodes3)
+    #print(x1)
+    x2 = np.linspace(0.5,1.5,nodes2)
+    #print(x2)
+    x3 = np.linspace(1.5,3.,nodes3)
+    #print(x3)
     x = np.array(np.concatenate((x1,x2,x3)))
+    #print(x)
 
     xFull = np.linspace(0,3.,nodesFull)
-
+    print(xFull)
     forceCoupled = forceCoupling(nodes1+nodes2+nodes3,x)
 
     forceCoupled[nodes1-1] = 0
@@ -351,46 +361,56 @@ for i in range(start,start+4):
     forceCoupled[nodes1+nodes2-1] = 0
     forceCoupled[nodes1+nodes2] = 0
 
+    np.savetxt("vhm-force.csv", forceCoupled, delimiter=",")
+
     uFDMVHM = solve(CouplingFDVHM(nodes1,nodes2,nodes3,h),forceCoupled)
     uSlice = np.array(np.concatenate((uFDMVHM[0:nodes1],uFDMVHM[nodes1+1:nodes1+nodes2],uFDMVHM[nodes1+nodes2+1:nodes1+nodes2+nodes3])))
+
+    print(xFull-np.array(np.concatenate((x[0:nodes1],x[nodes1+1:nodes1+nodes2],x[nodes1+nodes2+1:nodes1+nodes2+nodes3]))))
 
     uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
     print("------")
-    #print(uFDMVHM[nodes1-1])
-    #print(uFDMVHM[nodes1])
+    print(uFDMVHM[nodes1-1])
+    print(uFDMVHM[nodes1])
     #print(uFD[nodes1-1])
-    print("PD")
-    upfd = (-2 * uFDMVHM[nodes1-4]   + 9 *  uFDMVHM[nodes1-3]  - 18 * uFDMVHM[nodes1-2] +  11 * uFDMVHM[nodes1-1] ) / 6
-    uppd = (-2 * uFDMVHM[nodes1+3]   + 9 *  uFDMVHM[nodes1+2]  - 18 * uFDMVHM[nodes1+1] +  11 * uFDMVHM[nodes1] ) / 6
-    print(upfd)
-    print(uppd)
-    print(abs(uppd)-abs(upfd))
+    #print("PD")
+    #upfd = (-2 * uFDMVHM[nodes1-4]   + 9 *  uFDMVHM[nodes1-3]  - 18 * uFDMVHM[nodes1-2] +  11 * uFDMVHM[nodes1-1] ) / 6
+    #uppd = (-2 * uFDMVHM[nodes1+3]   + 9 *  uFDMVHM[nodes1+2]  - 18 * uFDMVHM[nodes1+1] +  11 * uFDMVHM[nodes1] ) / 6
+    #print(upfd)
+    #print(uppd)
+    #print(abs(uppd)-abs(upfd))
 
-    upfdl = (-2 * uFD[nodes1-4]   + 9 *  uFD[nodes1-3]  - 18 * uFD[nodes1-2] +  11 * uFD[nodes1-1] ) / 6
-    upfdr = (-2 * uFD[nodes1+2]   + 9 *  uFD[nodes1+1]  - 18 * uFD[nodes1] +  11 * uFD[nodes1-1] ) / 6
-    print("FDM ")
-    print(upfdl)
-    print(upfdr)
-    print(abs(upfdl)-abs(upfdr))
+    #upfdl = (-2 * uFD[nodes1-4]   + 9 *  uFD[nodes1-3]  - 18 * uFD[nodes1-2] +  11 * uFD[nodes1-1] ) / 6
+    #upfdr = (-2 * uFD[nodes1+2]   + 9 *  uFD[nodes1+1]  - 18 * uFD[nodes1] +  11 * uFD[nodes1-1] ) / 6
+    #print("FDM ")
+    #print(upfdl)
+    #print(upfdr)
+    #print(abs(upfdl)-abs(upfdr))
 
-    print("-- Second interface")
-    upfd = (-2 * uFDMVHM[nodes1+nodes2-4]   + 9 *  uFDMVHM[nodes1+nodes2-3]  - 18 * uFDMVHM[nodes1+nodes2-2] +  11 * uFDMVHM[nodes1+nodes2-1] ) / 6
-    uppd = (-2 * uFDMVHM[nodes1+nodes2+3]   + 9 *  uFDMVHM[nodes1+nodes2+2]  - 18 * uFDMVHM[nodes1+nodes2+1] +  11 * uFDMVHM[nodes1+nodes2] ) / 6
-    print(upfd)
-    print(uppd)
-    print(abs(uppd)-abs(upfd))
-    print("FDM")
-    upfdl = (-2 * uFD[nodes1+nodes2-4]   + 9 *  uFD[nodes1+nodes2-3]  - 18 * uFD[nodes1+nodes2-2] +  11 * uFD[nodes1+nodes2-1] ) / 6
-    upfdr = (-2 * uFD[nodes1+nodes2+2]   + 9 *  uFD[nodes1+nodes2+1]  - 18 * uFD[nodes1+nodes2] +  11 * uFD[nodes1+nodes2-1] ) / 6
-    print(upfdl)
-    print(upfdr)
-    print(abs(upfdl)-abs(upfdr))
-
+    #print("-- Second interface")
+    #upfd = (-2 * uFDMVHM[nodes1+nodes2-4]   + 9 *  uFDMVHM[nodes1+nodes2-3]  - 18 * uFDMVHM[nodes1+nodes2-2] +  11 * uFDMVHM[nodes1+nodes2-1] ) / 6
+    #uppd = (-2 * uFDMVHM[nodes1+nodes2+3]   + 9 *  uFDMVHM[nodes1+nodes2+2]  - 18 * uFDMVHM[nodes1+nodes2+1] +  11 * uFDMVHM[nodes1+nodes2] ) / 6
+    #print(upfd)
+    #print(uppd)
+    #print(abs(uppd)-abs(upfd))
+    #print("FDM")
+    #upfdl = (-2 * uFD[nodes1+nodes2-4]   + 9 *  uFD[nodes1+nodes2-3]  - 18 * uFD[nodes1+nodes2-2] +  11 * uFD[nodes1+nodes2-1] ) / 6
+    #upfdr = (-2 * uFD[nodes1+nodes2+2]   + 9 *  uFD[nodes1+nodes2+1]  - 18 * uFD[nodes1+nodes2] +  11 * uFD[nodes1+nodes2-1] ) / 6
+    #print(upfdl)
+    #print(upfdr)
+    #print(abs(upfdl)-abs(upfdr))
+    #print(uSlice[36])
+    print(uFD[nodes1])
+    #print((uSlice-uFD)[35])
+    print((uSlice-uFD)[nodes1])
+    print((uSlice-uFD)[nodes2])
+    print(uSlice-uFD)
+    #print((uSlice-uFD)[37])
+    #print((uSlice-uFD)[38])
+    #print(uFD)
+    #print(uFDMVHM)
     print("-------")
-
-    plt.axvline(x=0.5,c="#536872")
-    plt.axvline(x=2.25,c="#536872")
 
     if example == "Steep":
        
@@ -404,6 +424,8 @@ for i in range(start,start+4):
             uFD = solve(FDM(nodesFull,h),forceFull(nodesFull,h))
 
             plt.plot(xFull,uSlice-uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+            #plt.plot(xFull,uFD,label=r"$\delta$=1/"+str(int(n/2))+"",c="black",marker=markers[i-start],markevery=n)
+            #plt.errorbar(xFull,uSlice-uFD,yerr=uSlice-uFD)
             plt.ylabel("Error in displacement w.r.t. FDM")
             
 
