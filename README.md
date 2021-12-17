@@ -1,5 +1,6 @@
 # Supplementary material: Coupling approaches for classical linear elasticity and bond-basedperidynamic models
 
+[![DOI](https://zenodo.org/badge/336118235.svg)](https://zenodo.org/badge/latestdoi/336118235)
 
 ## Dependencies
 
