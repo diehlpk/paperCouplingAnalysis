@@ -1,6 +1,6 @@
 # Supplementary material: Coupling approaches for classical linear elasticity and bond-basedperidynamic models
 
-[![DOI](https://zenodo.org/badge/336118235.svg)](https://zenodo.org/badge/latestdoi/336118235) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ca0978c2b61949f292aa4663d67e1115)](https://www.codacy.com/gh/diehlpk/paperCouplingAnalysis/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=diehlpk/paperCouplingAnalysis&amp;utm_campaign=Badge_Grade)
+[![DOI](https://zenodo.org/badge/336118235.svg)](https://zenodo.org/badge/latestdoi/336118235) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ca0978c2b61949f292aa4663d67e1115)](https://www.codacy.com/gh/diehlpk/paperCouplingAnalysis/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=diehlpk/paperCouplingAnalysis&amp;utm_campaign=Badge_Grade) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/diehlpk/paperCouplingAnalysis/main)
 
 ## Dependencies
 
